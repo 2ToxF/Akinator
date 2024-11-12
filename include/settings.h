@@ -1,17 +1,19 @@
 #ifndef _SETTINGS_H
 #define _SETTINGS_H
 
-// #define TREE_ELEM_T STRING
+static const int MAX_STR_LEN = 100;
 
-#if defined TREE_ELEM_T && TREE_ELEM_T == STRING
-    typedef const char* TreeElem_t;
-#else
-    typedef double TreeElem_t;
-#endif
+typedef char TreeElem_t[MAX_STR_LEN];
 
 enum CodeError
 {
     NO_ERROR,
+
+    FILE_NOT_OPENED_ERR,
+
+    NO_MEM_FOR_TREE_ERR,
+    NULL_TREE_TO_SAVE_ERR,
+    TREE_ALREADY_INITED_ERR,
 };
 
 #endif

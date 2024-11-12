@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include "input_output.h"
 #include "tree.h"
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -9,42 +11,35 @@
 // ---------------------------------------------------------------------------------------------------------------
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-struct TreeNode_t
+
+TreeError TreeAddNode(TreeNode_t* node, const TreeElem_t value,
+                      TreeRelation relation, DataKind kind_of_new_data)
 {
-    TreeElem_t  data;
-    TreeNode_t* left;
-    TreeNode_t* right;
-};
+    TreeNode_t* prev_node = node;
 
-
-#if defined TREE_ELEM_T && TREE_ELEM_T == STRING
-#else
-    TreeError TreeAddNode(TreeNode_t* node, TreeElem_t value)
+    while (node != NULL)
     {
-        TreeNode_t* prev_node = node;
-
-        while (node != NULL)
-        {
-            prev_node = node;
-            if (value < node->data)
-                node = node->left;
-            else
-                node = node->right;
-        }
-
-        node = (TreeNode_t*) calloc(1, sizeof(TreeNode_t));
-        if (node == NULL)
-            return TREE_NO_MEM_ERR;
-        node->data = value;
-
-        if (value < prev_node->data)
-            prev_node->left = node;
+        prev_node = node;
+        if (relation == LEFT_SON)
+            node = node->left;
         else
-            prev_node->right = node;
-
-        return TREE_NO_ERROR;
+            node = node->right;
     }
-#endif
+
+    node = (TreeNode_t*) calloc(1, sizeof(TreeNode_t));
+    if (node == NULL)
+        return TREE_NO_MEM_ERR;
+
+    strcpy(node->data, value);
+    node->kind_of_data = kind_of_new_data;
+
+    if (relation == LEFT_SON)
+        prev_node->left = node;
+    else
+        prev_node->right = node;
+
+    return TREE_NO_ERROR;
+}
 
 
 void TreeDtor(TreeNode_t* node)
@@ -56,13 +51,14 @@ void TreeDtor(TreeNode_t* node)
     free(node);
 }
 
-TreeNode_t* TreeInit(TreeElem_t value)
+TreeNode_t* TreeInit(const TreeElem_t value, DataKind kind_of_root_data)
 {
     TreeNode_t* tree_root = (TreeNode_t*) calloc(1, sizeof(TreeNode_t));
     if (tree_root == NULL)
         return tree_root;
 
-    tree_root->data = value;
+    strcpy(tree_root->data, value);
+    tree_root->kind_of_data = kind_of_root_data;
     return tree_root;
 }
 
@@ -72,6 +68,7 @@ TreeNode_t* TreeInit(TreeElem_t value)
 // ------> !!! DUMP PART !!! <-----------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 #define DUMP_LOG_PATH  "logs/"
 #define DUMP_DOT_FNAME DUMP_LOG_PATH "dump_dotfile"
@@ -84,13 +81,6 @@ static char dump_graph_fname[MAX_FNAME_LEN] = {};
 
 static int   dump_number    = 0;
 static FILE* dump_html_fptr = NULL;
-
-enum TreeRelation
-{
-    ROOT,
-    LEFT_SON,
-    RIGHT_SON,
-};
 
 static void DumpDotFile  (TreeNode_t* node);
 static void DumpDotNode  (FILE* dot_file, TreeNode_t* node, TreeNode_t* prev_node, TreeRelation tree_relation);
@@ -114,6 +104,7 @@ static void DumpDotFile(TreeNode_t* node)
 
     fprintf(dot_file,
             "digraph {\n"
+            "\tranksep=\"0.7\"\n"
             "\tnslimit=1;\n"
             "\tnslimit1=1;\n"
             "\trankdir=TB;\n"
@@ -139,22 +130,22 @@ static void DumpDotNode(FILE* dot_file, TreeNode_t* node, TreeNode_t* prev_node,
     const char* str_right_ptr = NULL;
 
     if (node->left == NULL)
-        str_left_ptr = "0";
+        str_left_ptr = "-";
     else
     {
-        str_left_ptr = "left";
+        str_left_ptr = "no";
         DumpDotNode(dot_file, node->left, node, LEFT_SON);
     }
 
     if (node->right == NULL)
-        str_right_ptr = "0";
+        str_right_ptr = "-";
     else
     {
-        str_right_ptr = "right";
+        str_right_ptr = "yes";
         DumpDotNode(dot_file, node->right, node, RIGHT_SON);
     }
 
-    fprintf(dot_file, "\tp%p[label=\"{data: %lg | {<left> %s | <right> %s}}\"];\n",
+    fprintf(dot_file, "\tp%p[label=\"{data: %s | {<left> %s | <right> %s}}\"];\n",
             node, node->data, str_left_ptr, str_right_ptr);
 
     if (prev_node != NULL)
@@ -194,7 +185,7 @@ void SystemCallDot()
     sprintf(dump_graph_fname, "tree_graph%d.svg", dump_number);
 
     char command[MAX_CMD_LEN] = {};
-    sprintf(command, "dot -Tsvg -Gdpi=150 " DUMP_DOT_FNAME " -o " DUMP_LOG_PATH "%s", dump_graph_fname);
+    sprintf(command, "dot -Tsvg " DUMP_DOT_FNAME " -o " DUMP_LOG_PATH "%s", dump_graph_fname);
 
     if (system(command) != 0)
     {

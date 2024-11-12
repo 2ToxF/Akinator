@@ -1,0 +1,33 @@
+{
+Is your character an animal?
+	{
+	Is your character a maths teacher?
+		{
+		Is your character a physics teacher?
+			{
+			DED CHTOLE?
+				{
+				DED INSIDE
+					*
+					*
+				}
+				*
+			}
+			{
+			I don't know such(
+				*
+				*
+			}
+		}
+		{
+		Kalinichenko
+			*
+			*
+		}
+	}
+	{
+	Poltorashka
+		*
+		*
+	}
+}

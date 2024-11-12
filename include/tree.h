@@ -3,27 +3,39 @@
 
 #include "settings.h"
 
-#define BLK "\033[0;30m"
-#define RED "\033[0;31m"
-#define GRN "\033[0;32m"
-#define YEL "\033[0;33m"
-#define BLU "\033[0;34m"
-#define MAG "\033[0;35m"
-#define CYN "\033[0;36m"
-#define WHT "\033[0;37m"
-
 enum TreeError
 {
     TREE_NO_ERROR,
     TREE_NO_MEM_ERR,
 };
 
-struct TreeNode_t;
+enum TreeRelation
+{
+    ROOT,
+    LEFT_SON,
+    RIGHT_SON,
+};
+
+enum DataKind
+{
+    QUESTION,
+    ANSWER,
+};
+
+struct TreeNode_t
+{
+    DataKind    kind_of_data;
+    TreeElem_t  data;
+    TreeNode_t* left;
+    TreeNode_t* right;
+};
+
+TreeError   TreeAddNode (TreeNode_t* node, const TreeElem_t value,
+                         TreeRelation relation, DataKind kind_of_new_data);
+void        TreeDtor    (TreeNode_t* node);
+TreeNode_t* TreeInit    (const TreeElem_t value, DataKind kind_of_root_data);
 
 void        DumpClose   ();
-TreeError   TreeAddNode (TreeNode_t* node, TreeElem_t value);
-void        TreeDtor    (TreeNode_t* node);
 void        TreeDump    (TreeNode_t* node);
-TreeNode_t* TreeInit    (TreeElem_t value);
 
 #endif
