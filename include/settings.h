@@ -9,4 +9,9 @@
     typedef double TreeElem_t;
 #endif
 
+enum CodeError
+{
+    NO_ERROR,
+};
+
 #endif
