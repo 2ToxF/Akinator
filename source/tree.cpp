@@ -135,27 +135,17 @@ static void DumpDotNode(FILE* dot_file, TreeNode_t* node, TreeNode_t* prev_node,
     if (node == NULL)
         return;
 
-    const char* str_left_ptr = NULL;
-    const char* str_right_ptr = NULL;
+    TreeNode_t* left_ptr  = node->left;
+    TreeNode_t* right_ptr = node->right;
 
-    if (node->left == NULL)
-        str_left_ptr = "0";
-    else
-    {
-        str_left_ptr = "left";
+    if (left_ptr != NULL)
         DumpDotNode(dot_file, node->left, node, LEFT_SON);
-    }
 
-    if (node->right == NULL)
-        str_right_ptr = "0";
-    else
-    {
-        str_right_ptr = "right";
+    if (right_ptr != NULL)
         DumpDotNode(dot_file, node->right, node, RIGHT_SON);
-    }
 
-    fprintf(dot_file, "\tp%p[label=\"{data: %lg | {<left> %s | <right> %s}}\"];\n",
-            node, node->data, str_left_ptr, str_right_ptr);
+    fprintf(dot_file, "\tp%p[label=\"{data: %lg | {<left> %llx | <right> %llx}}\"];\n",
+            node, node->data, (size_t) left_ptr, (size_t) right_ptr);
 
     if (prev_node != NULL)
     {
@@ -194,7 +184,7 @@ void SystemCallDot()
     sprintf(dump_graph_fname, "tree_graph%d.svg", dump_number);
 
     char command[MAX_CMD_LEN] = {};
-    sprintf(command, "dot -Tsvg -Gdpi=150 " DUMP_DOT_FNAME " -o " DUMP_LOG_PATH "%s", dump_graph_fname);
+    sprintf(command, "dot -Tsvg " DUMP_DOT_FNAME " -o " DUMP_LOG_PATH "%s", dump_graph_fname);
 
     if (system(command) != 0)
     {
