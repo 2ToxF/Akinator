@@ -17,34 +17,31 @@ struct TreeNode_t
 };
 
 
-#if defined TREE_ELEM_T && TREE_ELEM_T == STRING
-#else
-    TreeError TreeAddNode(TreeNode_t* node, TreeElem_t value)
+TreeError TreeAddNode(TreeNode_t* node, TreeElem_t value)
+{
+    TreeNode_t* prev_node = node;
+
+    while (node != NULL)
     {
-        TreeNode_t* prev_node = node;
-
-        while (node != NULL)
-        {
-            prev_node = node;
-            if (value < node->data)
-                node = node->left;
-            else
-                node = node->right;
-        }
-
-        node = (TreeNode_t*) calloc(1, sizeof(TreeNode_t));
-        if (node == NULL)
-            return TREE_NO_MEM_ERR;
-        node->data = value;
-
-        if (value < prev_node->data)
-            prev_node->left = node;
+        prev_node = node;
+        if (value < node->data)
+            node = node->left;
         else
-            prev_node->right = node;
-
-        return TREE_NO_ERROR;
+            node = node->right;
     }
-#endif
+
+    node = (TreeNode_t*) calloc(1, sizeof(TreeNode_t));
+    if (node == NULL)
+        return TREE_NO_MEM_ERR;
+    node->data = value;
+
+    if (value < prev_node->data)
+        prev_node->left = node;
+    else
+        prev_node->right = node;
+
+    return TREE_NO_ERROR;
+}
 
 
 void TreeDtor(TreeNode_t* node)
