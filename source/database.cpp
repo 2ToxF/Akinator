@@ -82,8 +82,9 @@ static CodeError ScanNode(char** database_buf, TreeNode_t** node, int recursion_
             return NO_MEM_FOR_TREE_ERR;
         return ScanNode(database_buf, node, recursion_level);
     }
-printf("!!!!!! before \"left\"  (r = %d): shift: %llu; char: %d = %c\n",
-       recursion_level, *database_buf - start_database_buf, **database_buf, **database_buf);
+
+// printf("!!!!!! before \"left\"  (r = %d): shift: %llu; char: %d = %c\n",
+//        recursion_level, *database_buf - start_database_buf, **database_buf, **database_buf);
     if (**database_buf == '{')
     {
         READ_SENTENCE_(left_son_data);
@@ -98,8 +99,8 @@ printf("!!!!!! before \"left\"  (r = %d): shift: %llu; char: %d = %c\n",
     else
         return DATABASE_READ_LEFT_ERR;
 
-printf("!!!!!! before \"right\" (r = %d): shift: %llu; char: %d = %c\n",
-       recursion_level, *database_buf - start_database_buf, **database_buf, **database_buf);
+// printf("!!!!!! before \"right\" (r = %d): shift: %llu; char: %d = %c\n",
+//        recursion_level, *database_buf - start_database_buf, **database_buf, **database_buf);
     BufSkipSpaces(database_buf);
     if (**database_buf == '{')
     {
@@ -116,7 +117,8 @@ printf("!!!!!! before \"right\" (r = %d): shift: %llu; char: %d = %c\n",
         return DATABASE_READ_RIGHT_ERR;
 
 // printf("!!!!!! before '}'     (r = %d): shift: %llu; char: %d = %c\n",
-       // recursion_level, *database_buf - start_database_buf, **database_buf, **database_buf);
+//        recursion_level, *database_buf - start_database_buf, **database_buf, **database_buf);
+    BufSkipSpaces(database_buf);
     if (**database_buf != '}')
         return DATABASE_READ_END_ERR;
     BufNextString(database_buf);
