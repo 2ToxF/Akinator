@@ -13,7 +13,7 @@
 
 
 TreeError TreeAddNode(TreeNode_t* node, const TreeElem_t value,
-                      TreeRelation relation /*, DataKind kind_of_new_data*/)
+                      NodesRelation relation /*, DataKind kind_of_new_data*/)
 {
     TreeNode_t* prev_node = node;
 
@@ -28,7 +28,7 @@ TreeError TreeAddNode(TreeNode_t* node, const TreeElem_t value,
 
     node = (TreeNode_t*) calloc(1, sizeof(TreeNode_t));
     if (node == NULL)
-        return TREE_NO_MEM_ERR;
+        return TREE_NO_MEM_FOUND_ERR;
 
     strcpy(node->data, value);
     // node->kind_of_data = kind_of_new_data;
@@ -63,6 +63,47 @@ TreeNode_t* TreeInit(const TreeElem_t value /*, DataKind kind_of_root_data*/)
 }
 
 
+TreeError TreeInsertNode(NodeInsertionData* ins_node_data)
+{
+    TreeError tree_err = TREE_NO_ERROR;
+
+    if (ins_node_data->prev_node == NULL)
+        return TREE_INSERTION_BEFORE_ROOT_ERR;
+
+    if (ins_node_data->relation_with_prev == LEFT_SON)
+        ins_node_data->prev_node->left = NULL;
+    else if (ins_node_data->relation_with_prev == RIGHT_SON)
+        ins_node_data->prev_node->right = NULL;
+    else
+        return TREE_INSERT_BOTH_RELATIONS_ERR;
+
+    if ((tree_err = TreeAddNode(ins_node_data->prev_node, ins_node_data->ins_value,
+                                ins_node_data->relation_with_prev)) != TREE_NO_ERROR)
+        return tree_err;
+
+    // TODO: можно сделать красивее и быстрее, если поместить left и right в массив
+    if (ins_node_data->relation_with_prev == LEFT_SON)
+    {
+        if (ins_node_data->relation_with_next == LEFT_SON)
+            ins_node_data->prev_node->left->left = ins_node_data->cur_node;
+
+        else if (ins_node_data->relation_with_next == RIGHT_SON)
+            ins_node_data->prev_node->left->right = ins_node_data->cur_node;
+    }
+
+    else if (ins_node_data->relation_with_prev == RIGHT_SON)
+    {
+        if (ins_node_data->relation_with_next == LEFT_SON)
+            ins_node_data->prev_node->right->left = ins_node_data->cur_node;
+
+        else if (ins_node_data->relation_with_next == RIGHT_SON)
+            ins_node_data->prev_node->right->right = ins_node_data->cur_node;
+    }
+
+    return tree_err;
+}
+
+
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // ---------------------------------------------------------------------------------------------------------------
 // ------> !!! DUMP PART !!! <-----------------------------------------------------------------------------
@@ -83,7 +124,7 @@ static int   dump_number    = 0;
 static FILE* dump_html_fptr = NULL;
 
 static void DumpDotFile  (TreeNode_t* node);
-static void DumpDotNode  (FILE* dot_file, TreeNode_t* node, TreeNode_t* prev_node, TreeRelation tree_relation);
+static void DumpDotNode  (FILE* dot_file, TreeNode_t* node, TreeNode_t* prev_node, NodesRelation tree_relation);
 static void DumpHtmlFile ();
 static void SystemCallDot();
 
@@ -117,11 +158,11 @@ static void DumpDotFile(TreeNode_t* node)
     DumpDotNode(dot_file, node, NULL, ROOT);
     fprintf(dot_file, "}\n");
 
-    fclose(dot_file);
+    fclose(dot_file); dot_file = NULL;
 }
 
 
-static void DumpDotNode(FILE* dot_file, TreeNode_t* node, TreeNode_t* prev_node, TreeRelation tree_relation)
+static void DumpDotNode(FILE* dot_file, TreeNode_t* node, TreeNode_t* prev_node, NodesRelation tree_relation)
 {
     if (node == NULL)
         return;
@@ -151,9 +192,9 @@ static void DumpDotNode(FILE* dot_file, TreeNode_t* node, TreeNode_t* prev_node,
     if (prev_node != NULL)
     {
         if (tree_relation == LEFT_SON)
-            fprintf(dot_file, "\tp%p:left -> p%p;\n", prev_node, node);
+            fprintf(dot_file, "\tp%p:left:s -> p%p;\n", prev_node, node);
         else if (tree_relation == RIGHT_SON)
-            fprintf(dot_file, "\tp%p:right -> p%p;\n", prev_node, node);
+            fprintf(dot_file, "\tp%p:right:s -> p%p;\n", prev_node, node);
     }
 }
 
@@ -189,7 +230,7 @@ void SystemCallDot()
 
     if (system(command) != 0)
     {
-        printf(RED "ERROR: SYSTEM CALL ERROR" WHT "\n");
+        printf(RED "ERROR: SYSTEM CALL ERROR" BLU " (command = %s)" WHT "\n", command);
         return;
     }
 }

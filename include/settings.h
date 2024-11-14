@@ -1,7 +1,7 @@
 #ifndef _SETTINGS_H
 #define _SETTINGS_H
 
-static const int MAX_STR_LEN = 100;
+const int MAX_STR_LEN = 100;
 
 typedef char TreeElem_t[MAX_STR_LEN];
 
@@ -18,6 +18,7 @@ enum CodeError
     DATABASE_READ_RIGHT_ERR,
 
     NO_MEM_FOR_TREE_ERR,
+    TREE_NOT_INITED_ERR,
 
     NULL_TREE_TO_SAVE_ERR,
     TREE_ALREADY_INITED_ERR,

@@ -8,7 +8,7 @@
 static char* start_database_buf = NULL;
 
 static void SaveNode(FILE* database, TreeNode_t* node, int node_level);
-static CodeError ScanNode(char** database_buf, TreeNode_t** node, int recursion_level);
+static CodeError ScanNode(char** database_buf, TreeNode_t** node);
 
 
 CodeError ReadDatabase(const char* database_fname, TreeNode_t** root)
@@ -25,7 +25,15 @@ CodeError ReadDatabase(const char* database_fname, TreeNode_t** root)
 
     start_database_buf = database_buf;
 
-    return ScanNode(&database_buf, root, 0);
+    BufNextSentence(&database_buf);               \
+    char root_data[MAX_STR_LEN] = {};             \
+    sscanf(database_buf, "%[^\r\n]", root_data);  \
+    BufNextSentence(&database_buf);
+
+    *root = TreeInit(root_data);
+    if (*root == NULL)
+        return NO_MEM_FOR_TREE_ERR;
+    return ScanNode(&database_buf, root);
 }
 
 
@@ -69,29 +77,16 @@ static void SaveNode(FILE* database, TreeNode_t* node, int node_level)
     sscanf(*database_buf, "%[^\r\n]", __var_name__);  \
     BufNextSentence(database_buf)
 
-static CodeError ScanNode(char** database_buf, TreeNode_t** node, int recursion_level)
+static CodeError ScanNode(char** database_buf, TreeNode_t** node)
 {
     CodeError code_err = NO_ERROR;
 
-    if (*node == NULL)
-    {
-        READ_SENTENCE_(root_data);
-        *node = TreeInit(root_data);
-// TreeDump(node);
-        if (*node == NULL)
-            return NO_MEM_FOR_TREE_ERR;
-        return ScanNode(database_buf, node, recursion_level);
-    }
-
-// printf("!!!!!! before \"left\"  (r = %d): shift: %llu; char: %d = %c\n",
-//        recursion_level, *database_buf - start_database_buf, **database_buf, **database_buf);
     if (**database_buf == '{')
     {
         READ_SENTENCE_(left_son_data);
         if (TreeAddNode(*node, left_son_data, LEFT_SON) != TREE_NO_ERROR)
             return TREE_ERROR;
-// TreeDump(node);
-        if ((code_err = ScanNode(database_buf, &(*node)->left, recursion_level + 1)) != NO_ERROR)
+        if ((code_err = ScanNode(database_buf, &(*node)->left)) != NO_ERROR)
             return code_err;
     }
     else if (**database_buf == '*')
@@ -99,16 +94,13 @@ static CodeError ScanNode(char** database_buf, TreeNode_t** node, int recursion_
     else
         return DATABASE_READ_LEFT_ERR;
 
-// printf("!!!!!! before \"right\" (r = %d): shift: %llu; char: %d = %c\n",
-//        recursion_level, *database_buf - start_database_buf, **database_buf, **database_buf);
     BufSkipSpaces(database_buf);
     if (**database_buf == '{')
     {
         READ_SENTENCE_(right_son_data);
         if (TreeAddNode(*node, right_son_data, RIGHT_SON) != TREE_NO_ERROR)
             return TREE_ERROR;
-// TreeDump(node);
-        if ((code_err = ScanNode(database_buf, &(*node)->right, recursion_level + 1)) != NO_ERROR)
+        if ((code_err = ScanNode(database_buf, &(*node)->right)) != NO_ERROR)
             return code_err;
     }
     else if (**database_buf == '*')
@@ -116,13 +108,10 @@ static CodeError ScanNode(char** database_buf, TreeNode_t** node, int recursion_
     else
         return DATABASE_READ_RIGHT_ERR;
 
-// printf("!!!!!! before '}'     (r = %d): shift: %llu; char: %d = %c\n",
-//        recursion_level, *database_buf - start_database_buf, **database_buf, **database_buf);
     BufSkipSpaces(database_buf);
     if (**database_buf != '}')
         return DATABASE_READ_END_ERR;
     BufNextString(database_buf);
-//TreeDump(node);
     return NO_ERROR;
 }
 

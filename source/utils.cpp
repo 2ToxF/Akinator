@@ -26,6 +26,13 @@ void BufSkipSpaces(char** buffer)
 }
 
 
+void ClearBuffer()
+{
+    int char_from_buffer = 0;
+    while ((char_from_buffer = getchar()) != '\n' && char_from_buffer != EOF) {}
+}
+
+
 CodeError Fsize(const char* file_name, long int* input_buffer_length)
 {
     struct stat input_file_stat = {};

@@ -6,14 +6,16 @@
 enum TreeError
 {
     TREE_NO_ERROR,
-    TREE_NO_MEM_ERR,
+    TREE_INSERTION_BEFORE_ROOT_ERR,
+    TREE_INSERT_BOTH_RELATIONS_ERR,
+    TREE_NO_MEM_FOUND_ERR,
 };
 
-enum TreeRelation
+enum NodesRelation
 {
-    ROOT,
     LEFT_SON,
     RIGHT_SON,
+    ROOT,
 };
 
 // enum DataKind
@@ -30,12 +32,24 @@ struct TreeNode_t
     TreeNode_t* right;
 };
 
-TreeError   TreeAddNode (TreeNode_t* node, const TreeElem_t value,
-                         TreeRelation relation /*, DataKind kind_of_new_data*/);
-void        TreeDtor    (TreeNode_t* node);
-TreeNode_t* TreeInit    (const TreeElem_t value /*, DataKind kind_of_root_data*/);
+struct NodeInsertionData
+{
+    TreeNode_t*      prev_node;
+    NodesRelation    relation_with_prev;
 
-void        DumpClose   ();
-void        TreeDump    (TreeNode_t* node);
+    TreeNode_t*      cur_node;
+    NodesRelation    relation_with_next;
+
+    TreeElem_t ins_value;
+};
+
+TreeError   TreeAddNode   (TreeNode_t* node, const TreeElem_t value,
+                           NodesRelation relation /*, DataKind kind_of_new_data*/);
+void        TreeDtor      (TreeNode_t* node);
+TreeNode_t* TreeInit      (const TreeElem_t value /*, DataKind kind_of_root_data*/);
+TreeError   TreeInsertNode(NodeInsertionData* ins_node_data);
+
+void        DumpClose     ();
+void        TreeDump      (TreeNode_t* node);
 
 #endif

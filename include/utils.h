@@ -6,6 +6,7 @@
 void      BufNextSentence(char** buffer);
 void      BufNextString  (char** buffer);
 void      BufSkipSpaces  (char** buffer);
+void      ClearBuffer    ();
 CodeError Fsize          (const char* file_name, long int* input_buffer_length);
 
 #endif

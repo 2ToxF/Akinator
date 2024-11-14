@@ -48,6 +48,7 @@ void PrintCodeError(CodeError code_error)
         ERR_DESCR_(DATABASE_READ_RIGHT_ERR);
 
         ERR_DESCR_(NO_MEM_FOR_TREE_ERR);
+        ERR_DESCR_(TREE_NOT_INITED_ERR);
 
         ERR_DESCR_(NULL_TREE_TO_SAVE_ERR);
         ERR_DESCR_(TREE_ALREADY_INITED_ERR);

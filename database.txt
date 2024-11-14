@@ -3,34 +3,46 @@
 	{
 		Is your character a maths teacher?
 		{
-			Is your character a physics teacher?
+			Is your character a programming teacher?
 			{
-				DED CHTOLE?
+				Troyan-Golovyan
+				*
+				*
+			}
+			{
+				Is your character a programming teacher of PRODVA?
+				{
+					Kuliev
+					*
+					*
+				}
 				{
 					DED INSIDE
 					*
 					*
 				}
-				*
-			}
-			{
-				I don't know such(
-				*
-				*
 			}
 		}
 		{
-			Kalinichenko
-			*
-			*
+			Is your character 'that guy'?
+			{
+				Redkozubov
+				*
+				*
+			}
+			{
+				Kalinichenko
+				*
+				*
+			}
 		}
 	}
 	{
 		Cute kitty?
 		{
-			DED KVADROBER CHTOLE?
+			Do you know that DED IS KVADROBER???
 			{
-				I don't know such(
+				DED KVADROBER - know that
 				*
 				*
 			}
@@ -41,9 +53,17 @@
 			}
 		}
 		{
-			Poltorashka
-			*
-			*
+			Does your character live in the 'Kopeika' dormitory?
+			{
+				Piska
+				*
+				*
+			}
+			{
+				Poltorashka
+				*
+				*
+			}
 		}
 	}
 }
