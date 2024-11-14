@@ -49,6 +49,147 @@ CodeError RunAkinator()
 
     TreeDump(db_tree_root);
 
+    if ((code_err = RunGame(db_tree_root)) != NO_ERROR)
+        return code_err;
+
+    TreeDump(db_tree_root);
+    DumpClose();
+
+    return code_err;
+}
+
+
+static CodeError RunGame(TreeNode_t* db_tree)
+{
+    CodeError code_err = NO_ERROR;
+
+    while (RunOneGame(db_tree, &code_err)) {}
+
+    if (code_err != NO_ERROR)
+        return code_err;
+
+    return AskToSaveDB(DATABASE_FILE_NAME, db_tree);
+}
+
+
+static bool RunOneGame(TreeNode_t* db_tree, CodeError* p_code_err)
+{
+    NodeConnection node_con = {db_tree, db_tree, ROOT};
+
+    while (true)
+    {
+        if (node_con.node == NULL)
+        {
+            printf(YEL "Sorry, I don't know such character :(" WHT "\n");
+            return true;
+        }
+
+        if (node_con.node->data[strlen(node_con.node->data) - 1] != '?')
+        {
+            int user_answer = 0;
+
+            printf(YEL "Your character IS --> %s <-- ? (Y|N)" WHT "\n", node_con.node->data);
+            user_answer = getchar();
+
+            if ((user_answer == 'y' || user_answer == 'Y') && getchar() == '\n')
+                printf(YEL "Thanks for playing then!" WHT "\n");
+
+            else if ((user_answer == 'n' || user_answer == 'N') && getchar() == '\n')
+            {
+                NewElemForDatabase new_data = {};
+                GetNewData(&new_data);
+                if ((*p_code_err = UpdateDatabase(&node_con, &new_data)) != NO_ERROR)
+                    return false;
+            }
+
+            else
+            {
+                printf(RED "Sorry, I don't know such answer :( Please, write 'y', 'Y', 'n' or 'N'\n");
+                ClearBuffer();
+                continue;
+            }
+
+            break;
+        }
+
+        AskQuestion(&node_con);
+    }
+
+    return AskOneMoreGame();
+}
+
+
+// --------------------------------------------------------------------------------------------------------
+
+
+static bool AskOneMoreGame()
+{
+    while (true)
+    {
+        printf(YEL "Do you wanna play one more time? (Y|N)" WHT "\n");
+        int user_answer = getchar();
+
+        if ((user_answer == 'y' || user_answer == 'Y') && getchar() == '\n')
+            return true;
+
+        else if ((user_answer == 'n' || user_answer == 'N') && getchar() == '\n')
+            return false;
+
+        else
+        {
+            printf(RED "Sorry, I don't know such answer :( Please, write 'y', 'Y', 'n' or 'N'\n");
+            ClearBuffer();
+            continue;
+        }
+
+        break;
+    }
+}
+
+
+static void AskQuestion(NodeConnection* node_con)
+{
+    printf(YEL "%s (Y|N)" WHT "\n", node_con->node->data);
+    int user_answer = getchar();
+
+    if ((user_answer == 'y' || user_answer == 'Y') && getchar() == '\n')
+    {
+        node_con->prev_node = node_con->node;
+        node_con->node = node_con->node->right;
+        node_con->last_relation = RIGHT_SON;
+    }
+
+    else if ((user_answer == 'n' || user_answer == 'N') && getchar() == '\n')
+    {
+        node_con->prev_node = node_con->node;
+        node_con->node = node_con->node->left;
+        node_con->last_relation = LEFT_SON;
+    }
+
+    else
+    {
+        printf(RED "Sorry, I don't know such answer :( Please, write 'y', 'Y', 'n' or 'N'\n");
+        ClearBuffer();
+    }
+}
+
+
+static CodeError AskToSaveDB(const char* database_fname, TreeNode_t* db_tree)
+{
+    printf(BLU "Want to save current tree with data to local database?" WHT "\n");
+    int user_answer = getchar();
+
+    while(true)
+    {
+        if ((user_answer == 'y' || user_answer == 'Y') && getchar() == '\n')
+        {
+            CodeError code_err = SaveTreeData(database_fname, db_tree);
+
+            if (code_err != NO_ERROR)
+                printf(RED "ERROR: programm met error during saving tree to database" WHT "\n");
+            else
+                printf(BLU "Tree was saved successfully" WHT "\n");
+
             return code_err;
         }
 
