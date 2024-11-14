@@ -12,6 +12,7 @@
 #define CYN "\033[0;36m"
 #define WHT "\033[0;37m"
 
+CodeError MyFread(char** input_buffer, long int* input_buffer_length, const char* input_file_name);
 void PrintCodeError(CodeError code_err);
 
 #endif

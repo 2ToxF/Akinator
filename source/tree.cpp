@@ -13,7 +13,7 @@
 
 
 TreeError TreeAddNode(TreeNode_t* node, const TreeElem_t value,
-                      TreeRelation relation, DataKind kind_of_new_data)
+                      TreeRelation relation /*, DataKind kind_of_new_data*/)
 {
     TreeNode_t* prev_node = node;
 
@@ -31,7 +31,7 @@ TreeError TreeAddNode(TreeNode_t* node, const TreeElem_t value,
         return TREE_NO_MEM_ERR;
 
     strcpy(node->data, value);
-    node->kind_of_data = kind_of_new_data;
+    // node->kind_of_data = kind_of_new_data;
 
     if (relation == LEFT_SON)
         prev_node->left = node;
@@ -51,14 +51,14 @@ void TreeDtor(TreeNode_t* node)
     free(node);
 }
 
-TreeNode_t* TreeInit(const TreeElem_t value, DataKind kind_of_root_data)
+TreeNode_t* TreeInit(const TreeElem_t value /*, DataKind kind_of_root_data*/)
 {
     TreeNode_t* tree_root = (TreeNode_t*) calloc(1, sizeof(TreeNode_t));
     if (tree_root == NULL)
         return tree_root;
 
     strcpy(tree_root->data, value);
-    tree_root->kind_of_data = kind_of_root_data;
+    // tree_root->kind_of_data = kind_of_root_data;
     return tree_root;
 }
 
