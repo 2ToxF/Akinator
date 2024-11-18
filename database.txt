@@ -1,66 +1,90 @@
 {
-	is an animal
+	is positive
 	{
-		is a maths teacher
+		is human
 		{
-			is a programming teacher
-			{
-				Troyan-Golovyan
-				*
-				*
-			}
-			{
-				is a programming teacher of PRODVA
-				{
-					Kuliev
-					*
-					*
-				}
-				{
-					DED INSIDE
-					*
-					*
-				}
-			}
+			Bill Cipher
+			*
+			*
 		}
 		{
-			is 'that guy'
+			is stuck-up young girl
 			{
-				Redkozubov
-				*
-				*
+				is deranged hillbilly
+				{
+					Gideon
+					*
+					*
+				}
+				{
+					McGucket
+					*
+					*
+				}
 			}
 			{
-				Kalinichenko
+				Pacifica
 				*
 				*
 			}
 		}
 	}
 	{
-		is cute kitty
+		is one of two most important protagonists
 		{
-			is DED KVADROBER??
+			is old
 			{
-				Toxa
-				*
-				*
+				is Mable's best friend
+				{
+					is daughter of lumberjack
+					{
+						Soos
+						*
+						*
+					}
+					{
+						Wendy
+						*
+						*
+					}
+				}
+				{
+					likes taking pictures with cell phones
+					{
+						Grenda
+						*
+						*
+					}
+					{
+						Candy
+						*
+						*
+					}
+				}
 			}
 			{
-				DED KVADROBER
-				*
-				*
+				disappeared into an alternate dimension
+				{
+					Stan
+					*
+					*
+				}
+				{
+					Ford
+					*
+					*
+				}
 			}
 		}
 		{
-			lives in the 'Kopeika' dormitory
+			always wears sweater with rainbow
 			{
-				Piska
+				Dipper
 				*
 				*
 			}
 			{
-				Poltorashka
+				Mable
 				*
 				*
 			}
