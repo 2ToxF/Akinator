@@ -13,20 +13,13 @@ enum TreeError
 
 enum NodesRelation
 {
+    NO_RELATION,
     LEFT_SON,
     RIGHT_SON,
-    ROOT,
 };
-
-// enum DataKind
-// {
-//     QUESTION,
-//     ANSWER,
-// };
 
 struct TreeNode_t
 {
-    // DataKind    kind_of_data;
     TreeElem_t  data;
     TreeNode_t* left;
     TreeNode_t* right;
@@ -43,13 +36,11 @@ struct NodeInsertionData
     TreeElem_t ins_value;
 };
 
-TreeError   TreeAddNode   (TreeNode_t* node, const TreeElem_t value,
-                           NodesRelation relation /*, DataKind kind_of_new_data*/);
-void        TreeDtor      (TreeNode_t* node);
-TreeNode_t* TreeInit      (const TreeElem_t value /*, DataKind kind_of_root_data*/);
-TreeError   TreeInsertNode(NodeInsertionData* ins_node_data);
 
-void        DumpClose     ();
-void        TreeDump      (TreeNode_t* node);
+TreeError   TreeAddNode   (TreeNode_t* node, const TreeElem_t value, NodesRelation relation);
+void        TreeDtor      (TreeNode_t* node);
+bool        TreeFindLeaf  (TreeNode_t* node, NodesRelation relations_arr[], TreeElem_t value, int cur_level);
+TreeNode_t* TreeInit      (const TreeElem_t value);
+TreeError   TreeInsertNode(NodeInsertionData* ins_node_data);
 
 #endif

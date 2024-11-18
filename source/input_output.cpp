@@ -43,6 +43,8 @@ void PrintCodeError(CodeError code_error)
         ERR_DESCR_(FILLING_FSTAT_ERR);
         ERR_DESCR_(WRONG_BUFSIZE_ERR);
 
+        ERR_DESCR_(SYSTEM_CALL_ERR);
+
         ERR_DESCR_(DATABASE_READ_END_ERR);
         ERR_DESCR_(DATABASE_READ_LEFT_ERR);
         ERR_DESCR_(DATABASE_READ_RIGHT_ERR);
@@ -53,6 +55,8 @@ void PrintCodeError(CodeError code_error)
         ERR_DESCR_(NULL_TREE_TO_SAVE_ERR);
         ERR_DESCR_(TREE_ALREADY_INITED_ERR);
         ERR_DESCR_(TREE_ERROR);
+
+        ERR_DESCR_(UNKNOWN_AKINATOR_MODE_ERR);
 
         default:
             printf("\n\n" RED "CODE_ERROR: UNKNOWN_ERROR" WHT "\n");

@@ -1,6 +1,7 @@
 #ifndef _SETTINGS_H
 #define _SETTINGS_H
 
+static const char* const DATABASE_FILE_NAME = "database.txt";
 const int MAX_STR_LEN = 100;
 
 typedef char TreeElem_t[MAX_STR_LEN];
@@ -13,6 +14,8 @@ enum CodeError
     FILLING_FSTAT_ERR,
     WRONG_BUFSIZE_ERR,
 
+    SYSTEM_CALL_ERR,
+
     DATABASE_READ_END_ERR,
     DATABASE_READ_LEFT_ERR,
     DATABASE_READ_RIGHT_ERR,
@@ -23,6 +26,8 @@ enum CodeError
     NULL_TREE_TO_SAVE_ERR,
     TREE_ALREADY_INITED_ERR,
     TREE_ERROR,
+
+    UNKNOWN_AKINATOR_MODE_ERR,
 };
 
 #endif

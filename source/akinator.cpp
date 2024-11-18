@@ -1,39 +1,96 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <unistd.h>
 
 #include "akinator.h"
 #include "database.h"
+#include "game_mode.h"
 #include "input_output.h"
 #include "tree.h"
+#include "tree_dump.h"
 #include "utils.h"
 
-static const char* const DATABASE_FILE_NAME = "database.txt";
+static const int MAX_RELATIONS_ARR_SIZE = 100;
 
-struct NodeConnection
+enum ProgramMode
 {
-    TreeNode_t*   prev_node;
-    TreeNode_t*   node;
-    NodesRelation last_relation;
+    AKINATOR_MODE,
+    COMPARE_MODE,
+    DATABASE_MODE,
+    INFO_MODE,
+    SAVE_QUIT_MODE,
+    QUIT_NO_SAVE_MODE,
 };
 
-struct NewElemForDatabase
+static ProgramMode ChooseProgramMode();
+static CodeError   OpenDBBrowser    (TreeNode_t* db_tree);
+static CodeError   RunCompareMode   (TreeNode_t* db_tree);
+static CodeError   RunInfoMode      (TreeNode_t* db_tree);
+
+
+static ProgramMode ChooseProgramMode()
 {
-    char character[MAX_STR_LEN];
-    char question [MAX_STR_LEN];
-    int  correct_user_answer;
-};
+    printf("\n\n"
+           BLU "-----------------------------------------------------------------------------------------" WHT "\n\n"
+           MAG "*******   ******** *******   ** ****     **     **     **********   *******   *******   \n"
+               "/**////** /**///// /**////** /**/**/**   /**    ****   /////**///   **/////** /**////** \n"
+               "/**    /**/**      /**    /**/**/**//**  /**   **//**      /**     **     //**/**   /** \n"
+               "/**    /**/******* /**    /**/**/** //** /**  **  //**     /**    /**      /**/*******  \n"
+               "/**    /**/**////  /**    /**/**/**  //**/** **********    /**    /**      /**/**///**  \n"
+               "/**    ** /**      /**    ** /**/**   //****/**//////**    /**    //**     ** /**  //** \n"
+               "/*******  /********/*******  /**/**    //***/**     /**    /**     //*******  /**   //**\n"
+               "///////   //////// ///////   // //      /// //      //     //       ///////   //     // \n" "\n"
+           BLU "-----------------------------------------------------------------------------------------" WHT "\n\n\n");
 
-static CodeError RunGame   (TreeNode_t* db_tree);
-static bool      RunOneGame(TreeNode_t* db_tree, CodeError* p_code_err);
+    printf(GRN "Choose one of modes:\n"
+               "[A] Akinanor      (wish someone or something and i'll guess it)\n"
+               "[C] Compare       (enter two characters and i'll whow you their difference)\n"
+               "[D] Database      (i'll show you current database tree)\n"
+               "[I] Info          (enter character and i'll show you what i know about him)\n"
+               "[S] Save and quit (quit with saving tree to database - \"safe quit\")\n"
+               "[Q] Quit          (quit without saving tree to database - \"unsafe quit\")\n" WHT "\n");
 
-static bool      AskOneMoreGame();
-static void      AskQuestion   (NodeConnection* node_con);
-static CodeError AskToSaveDB   (const char* database_fname, TreeNode_t* db_tree);
-static void      GetNewData    (                          NewElemForDatabase* new_data);
-static CodeError UpdateDatabase(NodeConnection* node_con, NewElemForDatabase* new_data);
+    int chosen_mode = 0;
+    while (true)
+    {
+        if (chosen_mode != '\n' && chosen_mode != 0)
+            ClearBuffer();
+        chosen_mode = getchar();
 
-// --------------------------------------------------------------------------------------------------------
+        if (CHECK_USER_ANSWER(chosen_mode, 'a', 'A'))
+            return AKINATOR_MODE;
+
+        else if (CHECK_USER_ANSWER(chosen_mode, 'c', 'C'))
+            return COMPARE_MODE;
+
+        else if (CHECK_USER_ANSWER(chosen_mode, 'd', 'D'))
+            return DATABASE_MODE;
+
+        else if (CHECK_USER_ANSWER(chosen_mode, 'i', 'I'))
+            return INFO_MODE;
+
+        else if (CHECK_USER_ANSWER(chosen_mode, 's', 'S'))
+            return SAVE_QUIT_MODE;
+
+        else if (CHECK_USER_ANSWER(chosen_mode, 'q', 'Q'))
+            return QUIT_NO_SAVE_MODE;
+
+        else
+            printf(RED "Sorry, i don't know such mode :(" WHT "\n");
+    }
+
+    return AKINATOR_MODE;
+}
+
+
+static CodeError OpenDBBrowser(TreeNode_t* db_tree)
+{
+    TreeDump(db_tree);
+    DumpClose();
+    if (system("start file:///C:/Users/Anton/Documents/GitHub/Akinator/" DUMP_HTML_FNAME) != 0)
+        return SYSTEM_CALL_ERR;
+    return NO_ERROR;
+}
 
 
 CodeError RunAkinator()
@@ -48,240 +105,150 @@ CodeError RunAkinator()
         return TREE_NOT_INITED_ERR;
 
     TreeDump(db_tree_root);
-
-    if ((code_err = RunGame(db_tree_root)) != NO_ERROR)
-        return code_err;
-
-    TreeDump(db_tree_root);
     DumpClose();
 
+    ProgramMode cmd_type = QUIT_NO_SAVE_MODE;
+
+    while (true)
+    {
+        cmd_type = ChooseProgramMode();
+
+        switch (cmd_type)
+        {
+            case AKINATOR_MODE:
+                if ((code_err = RunGameMode(db_tree_root)) != NO_ERROR)  // TODO: add modes
+                    return code_err;
+                break;
+
+            case COMPARE_MODE:
+                if ((code_err = RunCompareMode(db_tree_root)) != NO_ERROR)
+                    return code_err;
+                break;
+
+            case DATABASE_MODE:
+                if ((code_err = OpenDBBrowser(db_tree_root)) != NO_ERROR)
+                    return code_err;
+                break;
+
+            case INFO_MODE:
+                if ((code_err = RunInfoMode(db_tree_root)) != NO_ERROR)
+                    return code_err;
+                break;
+
+            case SAVE_QUIT_MODE:
+            {
+                code_err = SaveTreeData(DATABASE_FILE_NAME, db_tree_root);
+
+                if (code_err == NO_ERROR)
+                    printf(BLU "Database saved successfully" WHT "\n");
+
+                else
+                    printf(RED "Database wasn't saved because of error" WHT "\n");
+
+                return code_err;
+            }
+
+            case QUIT_NO_SAVE_MODE:
+                return NO_ERROR;
+
+            default:
+                return UNKNOWN_AKINATOR_MODE_ERR;
+                break;
+        }
+    }
+
+    DumpClose();
     return code_err;
 }
 
 
-static CodeError RunGame(TreeNode_t* db_tree)
+#define PRINT_FEATURE_(__first_idx__, __relations_arr_name__)                   \
+    if (i != __first_idx__)                                                     \
+        printf(", ");                                                           \
+                                                                                \
+    if (__relations_arr_name__[i] == LEFT_SON)                                  \
+    {                                                                           \
+        printf("NOT %s", cur_node->data);                                       \
+        cur_node = cur_node->left;                                              \
+    }                                                                           \
+                                                                                \
+    else if (__relations_arr_name__[i] == RIGHT_SON)                            \
+    {                                                                           \
+        printf("%s", cur_node->data);                                           \
+        cur_node = cur_node->right;                                             \
+    }
+
+#define SCAN_CHARACTER_AND_FIND_LEAF_(__tree_name__, __relations_arr_name__, __character_var_name__)                    \
+    char __character_var_name__[MAX_STR_LEN] = {};                                                                      \
+    scanf("%[^\n]", __character_var_name__);                                                                            \
+    ClearBuffer();                                                                                                      \
+                                                                                                                        \
+    NodesRelation __relations_arr_name__[MAX_RELATIONS_ARR_SIZE] = {};                                                  \
+    if (!TreeFindLeaf(__tree_name__, __relations_arr_name__, __character_var_name__, 0))                                \
+    {                                                                                                                   \
+        printf(RED "Sorry, I didn't find such character (%s) in my database" WHT "\n", __character_var_name__);         \
+        sleep(1);                                                                                                       \
+        return NO_ERROR;                                                                                                \
+    }
+
+static CodeError RunCompareMode(TreeNode_t* db_tree)
 {
-    CodeError code_err = NO_ERROR;
+    printf(YEL "Enter two characters who you want to compare" WHT "\n");
 
-    while (RunOneGame(db_tree, &code_err)) {}
+    SCAN_CHARACTER_AND_FIND_LEAF_(db_tree, relations_arr1, character1);
+    SCAN_CHARACTER_AND_FIND_LEAF_(db_tree, relations_arr2, character2);
 
-    if (code_err != NO_ERROR)
-        return code_err;
-
-    return AskToSaveDB(DATABASE_FILE_NAME, db_tree);
-}
-
-
-static bool RunOneGame(TreeNode_t* db_tree, CodeError* p_code_err)
-{
-    NodeConnection node_con = {db_tree, db_tree, ROOT};
-
-    while (true)
+    printf(YEL "Characters %s and %s have the following features in both: ", character1, character2);
+    int i = 0;
+    TreeNode_t* cur_node = db_tree;
+    while (relations_arr1[i] == relations_arr2[i] && relations_arr1[i] != NO_RELATION)
     {
-        if (node_con.node == NULL)
-        {
-            printf(YEL "Sorry, I don't know such character :(" WHT "\n");
-            return true;
-        }
-
-        if (node_con.node->data[strlen(node_con.node->data) - 1] != '?')
-        {
-            int user_answer = 0;
-
-            printf(YEL "Your character IS --> %s <-- ? (Y|N)" WHT "\n", node_con.node->data);
-            user_answer = getchar();
-
-            if ((user_answer == 'y' || user_answer == 'Y') && getchar() == '\n')
-                printf(YEL "Thanks for playing then!" WHT "\n");
-
-            else if ((user_answer == 'n' || user_answer == 'N') && getchar() == '\n')
-            {
-                NewElemForDatabase new_data = {};
-                GetNewData(&new_data);
-                if ((*p_code_err = UpdateDatabase(&node_con, &new_data)) != NO_ERROR)
-                    return false;
-            }
-
-            else
-            {
-                printf(RED "Sorry, I don't know such answer :( Please, write 'y', 'Y', 'n' or 'N'\n");
-                ClearBuffer();
-                continue;
-            }
-
-            break;
-        }
-
-        AskQuestion(&node_con);
+        PRINT_FEATURE_(0, relations_arr1);
+        ++i;
     }
+    printf(WHT "\n");
 
-    return AskOneMoreGame();
-}
-
-
-// --------------------------------------------------------------------------------------------------------
-
-
-static bool AskOneMoreGame()
-{
-    while (true)
+    TreeNode_t* distinctive_node = cur_node;
+    int distinctive_i = i;
+    printf(YEL "Character %s has the following distinctive features: ", character1);
+    while (relations_arr1[i] != NO_RELATION)
     {
-        printf(YEL "Do you wanna play one more time? (Y|N)" WHT "\n");
-        int user_answer = getchar();
-
-        if ((user_answer == 'y' || user_answer == 'Y') && getchar() == '\n')
-            return true;
-
-        else if ((user_answer == 'n' || user_answer == 'N') && getchar() == '\n')
-            return false;
-
-        else
-        {
-            printf(RED "Sorry, I don't know such answer :( Please, write 'y', 'Y', 'n' or 'N'\n");
-            ClearBuffer();
-            continue;
-        }
-
-        break;
+        PRINT_FEATURE_(distinctive_i, relations_arr1);
+        ++i;
     }
-}
+    printf(WHT "\n");
 
-
-static void AskQuestion(NodeConnection* node_con)
-{
-    printf(YEL "%s (Y|N)" WHT "\n", node_con->node->data);
-    int user_answer = getchar();
-
-    if ((user_answer == 'y' || user_answer == 'Y') && getchar() == '\n')
+    i = distinctive_i;
+    cur_node = distinctive_node;
+    printf(YEL "Character %s has the following distinctive features: ", character2);
+    while (relations_arr2[i] != NO_RELATION)
     {
-        node_con->prev_node = node_con->node;
-        node_con->node = node_con->node->right;
-        node_con->last_relation = RIGHT_SON;
+        PRINT_FEATURE_(distinctive_i, relations_arr2);
+        ++i;
     }
+    printf(WHT "\n");
 
-    else if ((user_answer == 'n' || user_answer == 'N') && getchar() == '\n')
-    {
-        node_con->prev_node = node_con->node;
-        node_con->node = node_con->node->left;
-        node_con->last_relation = LEFT_SON;
-    }
-
-    else
-    {
-        printf(RED "Sorry, I don't know such answer :( Please, write 'y', 'Y', 'n' or 'N'\n");
-        ClearBuffer();
-    }
-}
-
-
-static CodeError AskToSaveDB(const char* database_fname, TreeNode_t* db_tree)
-{
-    printf(BLU "Want to save current tree with data to local database?" WHT "\n");
-    int user_answer = getchar();
-
-    while(true)
-    {
-        if ((user_answer == 'y' || user_answer == 'Y') && getchar() == '\n')
-        {
-            CodeError code_err = SaveTreeData(database_fname, db_tree);
-
-            if (code_err != NO_ERROR)
-                printf(RED "ERROR: programm met error during saving tree to database" WHT "\n");
-            else
-                printf(BLU "Tree was saved successfully" WHT "\n");
-
-            return code_err;
-        }
-
-        else if ((user_answer == 'n' || user_answer == 'N') && getchar() == '\n')
-            printf(BLU "OK, bye! :) Have a nice day ^_^" WHT "\n");
-
-        else
-        {
-            printf(RED "Sorry, I don't know such answer :( Please, write 'y', 'Y', 'n' or 'N'\n");
-            ClearBuffer();
-            continue;
-        }
-
-        break;
-    }
-
+    sleep(3);
     return NO_ERROR;
 }
 
 
-static void GetNewData(NewElemForDatabase* new_data)
+static CodeError RunInfoMode(TreeNode_t* db_tree)
 {
-    printf("\n" MAG "WARNING: don't use double quotes while writing answers - it definitely WILL cause errors" WHT "\n");
-    printf(YEL "So, who (or maybe what) was your character? " WHT "\n");
-    scanf("%[^\n]", new_data->character);
-    ClearBuffer();
+    printf(YEL "Enter the character whose description you want to get" WHT "\n");
+    SCAN_CHARACTER_AND_FIND_LEAF_(db_tree, relations_arr, character)
 
-    while (true)
+    printf(YEL "I found character %s in my database with the following features: ", character);
+    TreeNode_t* cur_node = db_tree;
+    for (int i = 0; relations_arr[i] != NO_RELATION; ++i)
     {
-        printf(YEL "Now please write the question that differs your character and character mentioned in my answer." WHT "\n");
-        scanf("%[^\n]", new_data->question);
-        ClearBuffer();
-
-        if (new_data->question[strlen(new_data->question) - 1] == '?')
-            break;
-        printf(RED "Sorry, that is not a question :(" WHT "\n");
+        PRINT_FEATURE_(0, relations_arr);
     }
+    printf(WHT "\n");
 
-    printf(YEL "And the last. What should user answer on your question if he wished for your character?" WHT "\n");
-    /* last info (correct_user_answer) i need to get in the cycle in another function --> check UpdateDatabase() */
-}
-
-
-#define INSERT_NEW_DATA_(__caps_dir__)                                                                          \
-    if (TreeInsertNode(&ins_node_data) != TREE_NO_ERROR)                                                        \
-        return TREE_ERROR;                                                                                      \
-                                                                                                                \
-    if (node_con->last_relation == LEFT_SON)                                                                    \
-    {                                                                                                           \
-        if (TreeAddNode(node_con->prev_node->left, new_data->character, __caps_dir__##_SON) != TREE_NO_ERROR)   \
-            return TREE_ERROR;                                                                                  \
-    }                                                                                                           \
-                                                                                                                \
-    else if (node_con->last_relation == RIGHT_SON)                                                              \
-    {                                                                                                           \
-        if (TreeAddNode(node_con->prev_node->right, new_data->character, __caps_dir__##_SON) != TREE_NO_ERROR)  \
-            return TREE_ERROR;                                                                                  \
-    }
-
-static CodeError UpdateDatabase(NodeConnection* node_con, NewElemForDatabase* new_data)
-{
-    NodeInsertionData ins_node_data = {node_con->prev_node, node_con->last_relation, node_con->node, ROOT, {}};
-    strcpy(ins_node_data.ins_value, new_data->question);
-
-    while (true)
-    {
-        new_data->correct_user_answer = getchar();
-
-        if ((new_data->correct_user_answer == 'y' || new_data->correct_user_answer == 'Y') && getchar() == '\n')
-        {
-            ins_node_data.relation_with_next = LEFT_SON;
-            INSERT_NEW_DATA_(RIGHT);
-        }
-
-
-        else if ((new_data->correct_user_answer == 'n' || new_data->correct_user_answer == 'N') && getchar() == '\n')
-        {
-            ins_node_data.relation_with_next = RIGHT_SON;
-            INSERT_NEW_DATA_(LEFT);
-        }
-
-        else
-        {
-            printf(RED "Sorry, I don't know such answer :( Please, write 'y', 'Y', 'n' or 'N'" WHT "\n");
-            ClearBuffer();
-            continue;
-        }
-
-        break;
-    }
-
+    sleep(3);
     return NO_ERROR;
 }
 
-#undef INSERT_NEW_DATA_
+#undef PRINT_FEATURE_
+#undef SCAN_CHARACTER_AND_FIND_LEAF_

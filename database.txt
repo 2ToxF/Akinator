@@ -1,16 +1,16 @@
 {
-	Is your character an animal?
+	is an animal
 	{
-		Is your character a maths teacher?
+		is a maths teacher
 		{
-			Is your character a programming teacher?
+			is a programming teacher
 			{
 				Troyan-Golovyan
 				*
 				*
 			}
 			{
-				Is your character a programming teacher of PRODVA?
+				is a programming teacher of PRODVA
 				{
 					Kuliev
 					*
@@ -24,7 +24,7 @@
 			}
 		}
 		{
-			Is your character 'that guy'?
+			is 'that guy'
 			{
 				Redkozubov
 				*
@@ -38,21 +38,13 @@
 		}
 	}
 	{
-		Cute kitty?
+		is cute kitty
 		{
-			Do you know that DED IS KVADROBER???
+			is DED KVADROBER??
 			{
-				KSHCH_ZSR (Zhopa-register, he said that)?
-				{
-					DED KVADROBER - know that
-					*
-					*
-				}
-				{
-					Toxa
-					*
-					*
-				}
+				Toxa
+				*
+				*
 			}
 			{
 				DED KVADROBER
@@ -61,7 +53,7 @@
 			}
 		}
 		{
-			Does your character live in the 'Kopeika' dormitory?
+			lives in the 'Kopeika' dormitory
 			{
 				Piska
 				*
