@@ -46,7 +46,7 @@ static ProgramMode ChooseProgramMode()
 
     printf(GRN "Choose one of modes:\n"
                "[A] Akinanor      (wish someone or something and i'll guess it)\n"
-               "[C] Compare       (enter two characters and i'll whow you their difference)\n"
+               "[C] Compare       (enter two characters and i'll show you their difference)\n"
                "[D] Database      (i'll show you current database tree)\n"
                "[I] Info          (enter character and i'll show you what i know about him)\n"
                "[S] Save and quit (quit with saving tree to database - \"safe quit\")\n"
@@ -118,7 +118,7 @@ CodeError RunAkinator()
         switch (cmd_type)
         {
             case AKINATOR_MODE:
-                if ((code_err = RunGameMode(db_tree_root)) != NO_ERROR)  // TODO: add modes
+                if ((code_err = RunGameMode(db_tree_root)) != NO_ERROR)
                     return code_err;
                 break;
 
