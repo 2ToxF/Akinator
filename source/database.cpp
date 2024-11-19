@@ -25,9 +25,9 @@ CodeError ReadDatabase(const char* database_fname, TreeNode_t** root)
 
     start_database_buf = database_buf;
 
-    BufNextSentence(&database_buf);               \
-    char root_data[MAX_STR_LEN] = {};             \
-    sscanf(database_buf, "%[^\r\n]", root_data);  \
+    BufNextSentence(&database_buf);
+    char root_data[MAX_STR_LEN] = {};
+    sscanf(database_buf, "%[^\r\n]", root_data);
     BufNextSentence(&database_buf);
 
     *root = TreeInit(root_data);

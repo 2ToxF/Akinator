@@ -72,7 +72,7 @@ bool TreeFindLeaf(TreeNode_t* node, NodesRelation relations_arr[], TreeElem_t va
         return true;
     }
 
-    return false;;
+    return false;
 }
 
 

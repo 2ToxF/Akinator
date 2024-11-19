@@ -38,7 +38,7 @@ static void DumpDotFile(TreeNode_t* node)
             "\tnslimit1=1;\n"
             "\trankdir=TB;\n"
             "\tsplines=false;\n"
-            "\tbgcolor=\"darkslategray1\";\n"
+            "\tbgcolor=\"bisque2\";\n"
             "\tfontname=\"Courier New\";\n"
             "\tnode[shape=\"Mrecord\",color=\"coral\",style=\"filled\",fillcolor=\"darkmagenta\",fontcolor=\"white\",fontsize=14];\n"
             "\tedge[color=\"blue\"];\n"
@@ -74,8 +74,11 @@ static void DumpDotNode(FILE* dot_file, TreeNode_t* node, TreeNode_t* prev_node,
         DumpDotNode(dot_file, node->right, node, RIGHT_SON);
     }
 
-    fprintf(dot_file, "\tp%p[label=\"{%s | {<left> %s | <right> %s}}\"];\n",
-            node, node->data, str_left_ptr, str_right_ptr);
+    if (node->left == NULL && node->right == NULL)
+        fprintf(dot_file, "\tp%p[label=\"{%s}\", fillcolor=\"darkslategray1\", fontcolor=\"black\"];\n", node, node->data);
+    else
+        fprintf(dot_file, "\tp%p[label=\"{%s | {<left> %s | <right> %s}}\"];\n",
+                node, node->data, str_left_ptr, str_right_ptr);
 
     if (prev_node != NULL)
     {
