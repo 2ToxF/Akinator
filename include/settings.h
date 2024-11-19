@@ -1,7 +1,7 @@
 #ifndef _SETTINGS_H
 #define _SETTINGS_H
 
-static const char* const DATABASE_FILE_NAME = "Gravity_Falls_DB.txt";
+static const char* const DATABASE_FILE_NAME = "Test_DB.txt";
 const int MAX_STR_LEN = 100;
 
 typedef char TreeElem_t[MAX_STR_LEN];
