@@ -49,8 +49,8 @@ static ProgramMode ChooseProgramMode()
                "[C] Compare       (enter two characters and i'll show you their difference)\n"
                "[D] Database      (i'll show you current database tree)\n"
                "[I] Info          (enter character and i'll show you what i know about him)\n"
-               "[S] Save and quit (quit with saving tree to database - \"safe quit\")\n"
-               "[Q] Quit          (quit without saving tree to database - \"unsafe quit\")\n" WHT "\n");
+               "[S] Save and quit (quit with saving tree to database)\n"
+               "[Q] Quit          (quit without saving tree to database)\n" WHT "\n");
 
     int chosen_mode = 0;
     while (true)

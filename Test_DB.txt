@@ -1,0 +1,69 @@
+{
+	is an animal
+	{
+		is a maths teacher
+		{
+			is a programming teacher
+			{
+				Troyan-Golovyan
+				*
+				*
+			}
+			{
+				is a programming teacher of PRODVA
+				{
+					Kuliev
+					*
+					*
+				}
+				{
+					DED INSIDE
+					*
+					*
+				}
+			}
+		}
+		{
+			is 'that guy'
+			{
+				Redkozubov
+				*
+				*
+			}
+			{
+				Kalinichenko
+				*
+				*
+			}
+		}
+	}
+	{
+		is cute kitty
+		{
+			is DED KVADROBER??
+			{
+				Some pidoras
+				*
+				*
+			}
+			{
+				DED KVADROBER
+				*
+				*
+			}
+		}
+		{
+			lives in the 'Kopeika' dormitory
+			{
+				Piska
+				*
+				*
+			}
+			{
+				Poltorashka
+				*
+				*
+			}
+		}
+	}
+}
