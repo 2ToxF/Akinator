@@ -40,5 +40,5 @@ CodeError Fsize(const char* file_name, long int* input_buffer_length)
         return FILLING_FSTAT_ERR;
 
     *input_buffer_length = input_file_stat.st_size + 1;
-    return NO_ERROR;
+    return NO_ERR;
 }

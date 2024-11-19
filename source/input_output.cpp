@@ -7,13 +7,13 @@
 
 CodeError MyFread(char** input_buffer, long int* input_buffer_length, const char* input_file_name)
 {
-    CodeError code_err = NO_ERROR;
+    CodeError code_err = NO_ERR;
 
     FILE* input_fptr = fopen(input_file_name, "rb");
     if (input_fptr == NULL)
         return FILE_NOT_OPENED_ERR;
 
-    if ((code_err = Fsize(input_file_name, input_buffer_length)) != NO_ERROR)
+    if ((code_err = Fsize(input_file_name, input_buffer_length)) != NO_ERR)
         return code_err;
 
     *input_buffer = (char*) calloc(*input_buffer_length, sizeof(char));
@@ -35,7 +35,7 @@ void PrintCodeError(CodeError code_error)
 
     switch(code_error)
     {
-        case NO_ERROR:
+        case NO_ERR:
             printf("\n\n" GRN "Code was completed without errors" WHT "\n");
             break;
 

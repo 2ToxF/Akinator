@@ -13,14 +13,14 @@ static CodeError ScanNode(char** database_buf, TreeNode_t** node);
 
 CodeError ReadDatabase(const char* database_fname, TreeNode_t** root)
 {
-    CodeError code_err = NO_ERROR;
+    CodeError code_err = NO_ERR;
 
     if (*root != NULL)
         return TREE_ALREADY_INITED_ERR;
 
     char*    database_buf = NULL;
     long int database_buf_length = 0;
-    if ((code_err = MyFread(&database_buf, &database_buf_length, database_fname)) != NO_ERROR)
+    if ((code_err = MyFread(&database_buf, &database_buf_length, database_fname)) != NO_ERR)
         return code_err;
 
     start_database_buf = database_buf;
@@ -79,14 +79,14 @@ static void SaveNode(FILE* database, TreeNode_t* node, int node_level)
 
 static CodeError ScanNode(char** database_buf, TreeNode_t** node)
 {
-    CodeError code_err = NO_ERROR;
+    CodeError code_err = NO_ERR;
 
     if (**database_buf == '{')
     {
         READ_SENTENCE_(left_son_data);
-        if (TreeAddNode(*node, left_son_data, LEFT_SON) != TREE_NO_ERROR)
+        if (TreeAddNode(*node, left_son_data, LEFT_SON) != TREE_NO_ERR)
             return TREE_ERROR;
-        if ((code_err = ScanNode(database_buf, &(*node)->left)) != NO_ERROR)
+        if ((code_err = ScanNode(database_buf, &(*node)->left)) != NO_ERR)
             return code_err;
     }
     else if (**database_buf == '*')
@@ -98,9 +98,9 @@ static CodeError ScanNode(char** database_buf, TreeNode_t** node)
     if (**database_buf == '{')
     {
         READ_SENTENCE_(right_son_data);
-        if (TreeAddNode(*node, right_son_data, RIGHT_SON) != TREE_NO_ERROR)
+        if (TreeAddNode(*node, right_son_data, RIGHT_SON) != TREE_NO_ERR)
             return TREE_ERROR;
-        if ((code_err = ScanNode(database_buf, &(*node)->right)) != NO_ERROR)
+        if ((code_err = ScanNode(database_buf, &(*node)->right)) != NO_ERR)
             return code_err;
     }
     else if (**database_buf == '*')
@@ -112,7 +112,7 @@ static CodeError ScanNode(char** database_buf, TreeNode_t** node)
     if (**database_buf != '}')
         return DATABASE_READ_END_ERR;
     BufNextString(database_buf);
-    return NO_ERROR;
+    return NO_ERR;
 }
 
 #undef READ_SENTENCE_
@@ -130,5 +130,5 @@ CodeError SaveTreeData(const char* database_fname, TreeNode_t* root)
     SaveNode(database, root, 0);
 
     fclose(database); database = NULL;
-    return NO_ERROR;
+    return NO_ERR;
 }

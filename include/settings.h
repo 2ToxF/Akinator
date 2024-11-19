@@ -8,7 +8,7 @@ typedef char TreeElem_t[MAX_STR_LEN];
 
 enum CodeError
 {
-    NO_ERROR,
+    NO_ERR,
 
     FILE_NOT_OPENED_ERR,
     FILLING_FSTAT_ERR,

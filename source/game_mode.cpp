@@ -124,14 +124,14 @@ static void GetNewData(NewElemForDatabase* new_data)
 
 CodeError RunGameMode(TreeNode_t* db_tree)
 {
-    CodeError code_err = NO_ERROR;
+    CodeError code_err = NO_ERR;
 
     while (RunOneGame(db_tree, &code_err)) {}
 
-    if (code_err != NO_ERROR)
+    if (code_err != NO_ERR)
         return code_err;
 
-    return NO_ERROR;
+    return NO_ERR;
 }
 
 
@@ -154,7 +154,7 @@ static bool GiveAnswer(NodeConnection* node_connection, CodeError* p_code_err)
         {
             NewElemForDatabase new_data = {};
             GetNewData(&new_data);
-            if ((*p_code_err = UpdateDatabase(node_connection, &new_data)) != NO_ERROR)
+            if ((*p_code_err = UpdateDatabase(node_connection, &new_data)) != NO_ERR)
                 return false;
         }
 
@@ -201,19 +201,19 @@ static CodeError UpdateDatabase(NodeConnection* node_connection, NewElemForDatab
     strcpy(ins_node_data.ins_value, new_data->question);
 
     ins_node_data.relation_with_next = LEFT_SON;
-    if (TreeInsertNode(&ins_node_data) != TREE_NO_ERROR)
+    if (TreeInsertNode(&ins_node_data) != TREE_NO_ERR)
         return TREE_ERROR;
 
     if (node_connection->last_relation == LEFT_SON)
     {
-        if (TreeAddNode(node_connection->prev_node->left, new_data->character, RIGHT_SON) != TREE_NO_ERROR)
+        if (TreeAddNode(node_connection->prev_node->left, new_data->character, RIGHT_SON) != TREE_NO_ERR)
             return TREE_ERROR;
     }
 
     else if (node_connection->last_relation == RIGHT_SON)
     {
-        if (TreeAddNode(node_connection->prev_node->right, new_data->character, RIGHT_SON) != TREE_NO_ERROR)
+        if (TreeAddNode(node_connection->prev_node->right, new_data->character, RIGHT_SON) != TREE_NO_ERR)
             return TREE_ERROR;
     }
-    return NO_ERROR;
+    return NO_ERR;
 }

@@ -1,3 +1,6 @@
+#define TX_USE_SPEAK
+#include <TXLib.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -91,16 +94,18 @@ static CodeError OpenDBBrowser(TreeNode_t* db_tree)
     DumpClose();
     if (system("start file:///C:/Users/Anton/Documents/GitHub/Akinator/" DUMP_HTML_FNAME) != 0)
         return SYSTEM_CALL_ERR;
-    return NO_ERROR;
+    return NO_ERR;
 }
 
 
 CodeError RunAkinator()
 {
-    CodeError code_err = NO_ERROR;
+    txDisableAutoPause();
+
+    CodeError code_err = NO_ERR;
 
     TreeNode_t* db_tree_root = NULL;
-    if ((code_err = ReadDatabase(DATABASE_FILE_NAME, &db_tree_root)) != NO_ERROR)
+    if ((code_err = ReadDatabase(DATABASE_FILE_NAME, &db_tree_root)) != NO_ERR)
         return code_err;
 
     if (db_tree_root == NULL)
@@ -118,22 +123,22 @@ CodeError RunAkinator()
         switch (cmd_type)
         {
             case AKINATOR_MODE:
-                if ((code_err = RunGameMode(db_tree_root)) != NO_ERROR)
+                if ((code_err = RunGameMode(db_tree_root)) != NO_ERR)
                     return code_err;
                 break;
 
             case COMPARE_MODE:
-                if ((code_err = RunCompareMode(db_tree_root)) != NO_ERROR)
+                if ((code_err = RunCompareMode(db_tree_root)) != NO_ERR)
                     return code_err;
                 break;
 
             case DATABASE_MODE:
-                if ((code_err = OpenDBBrowser(db_tree_root)) != NO_ERROR)
+                if ((code_err = OpenDBBrowser(db_tree_root)) != NO_ERR)
                     return code_err;
                 break;
 
             case INFO_MODE:
-                if ((code_err = RunInfoMode(db_tree_root)) != NO_ERROR)
+                if ((code_err = RunInfoMode(db_tree_root)) != NO_ERR)
                     return code_err;
                 break;
 
@@ -141,7 +146,7 @@ CodeError RunAkinator()
             {
                 code_err = SaveTreeData(DATABASE_FILE_NAME, db_tree_root);
 
-                if (code_err == NO_ERROR)
+                if (code_err == NO_ERR)
                     printf(BLU "Database saved successfully" WHT "\n");
 
                 else
@@ -151,7 +156,7 @@ CodeError RunAkinator()
             }
 
             case QUIT_NO_SAVE_MODE:
-                return NO_ERROR;
+                return NO_ERR;
 
             default:
                 return UNKNOWN_AKINATOR_MODE_ERR;
@@ -164,19 +169,22 @@ CodeError RunAkinator()
 }
 
 
+char speak_buffer[4096] = {};
+char* cur_speak = speak_buffer;
+
 #define PRINT_FEATURE_(__first_idx__, __relations_arr_name__)                   \
     if (i != __first_idx__)                                                     \
-        printf(", ");                                                           \
+        cur_speak += sprintf(cur_speak, ", ");                                                           \
                                                                                 \
     if (__relations_arr_name__[i] == LEFT_SON)                                  \
     {                                                                           \
-        printf("NOT %s", cur_node->data);                                       \
+        cur_speak += sprintf(cur_speak, "NOT %s", cur_node->data);                                       \
         cur_node = cur_node->left;                                              \
     }                                                                           \
                                                                                 \
     else if (__relations_arr_name__[i] == RIGHT_SON)                            \
     {                                                                           \
-        printf("%s", cur_node->data);                                           \
+        cur_speak += sprintf(cur_speak, "%s", cur_node->data);                                           \
         cur_node = cur_node->right;                                             \
     }
 
@@ -190,17 +198,19 @@ CodeError RunAkinator()
     {                                                                                                                   \
         printf(RED "Sorry, I didn't find such character (%s) in my database" WHT "\n", __character_var_name__);         \
         sleep(1);                                                                                                       \
-        return NO_ERROR;                                                                                                \
+        return NO_ERR;                                                                                                \
     }
 
 static CodeError RunCompareMode(TreeNode_t* db_tree)
 {
+    cur_speak = speak_buffer;
+
     printf(YEL "Enter two characters who you want to compare" WHT "\n");
 
     SCAN_CHARACTER_AND_FIND_LEAF_(db_tree, relations_arr1, character1);
     SCAN_CHARACTER_AND_FIND_LEAF_(db_tree, relations_arr2, character2);
 
-    printf(YEL "Characters %s and %s have the following features in both: ", character1, character2);
+    cur_speak += sprintf(cur_speak, YEL "Characters %s and %s have the following features in both: ", character1, character2);
     int i = 0;
     TreeNode_t* cur_node = db_tree;
     while (relations_arr1[i] == relations_arr2[i] && relations_arr1[i] != NO_RELATION)
@@ -212,7 +222,7 @@ static CodeError RunCompareMode(TreeNode_t* db_tree)
 
     TreeNode_t* distinctive_node = cur_node;
     int distinctive_i = i;
-    printf(YEL "Character %s has the following distinctive features: ", character1);
+    cur_speak += sprintf(cur_speak, YEL "Character %s has the following distinctive features: ", character1);
     while (relations_arr1[i] != NO_RELATION)
     {
         PRINT_FEATURE_(distinctive_i, relations_arr1);
@@ -222,7 +232,7 @@ static CodeError RunCompareMode(TreeNode_t* db_tree)
 
     i = distinctive_i;
     cur_node = distinctive_node;
-    printf(YEL "Character %s has the following distinctive features: ", character2);
+    cur_speak += sprintf(cur_speak, YEL "Character %s has the following distinctive features: ", character2);
     while (relations_arr2[i] != NO_RELATION)
     {
         PRINT_FEATURE_(distinctive_i, relations_arr2);
@@ -230,8 +240,10 @@ static CodeError RunCompareMode(TreeNode_t* db_tree)
     }
     printf(WHT "\n");
 
+    txSpeak("\v\a%s", speak_buffer);
+
     sleep(3);
-    return NO_ERROR;
+    return NO_ERR;
 }
 
 
@@ -249,7 +261,7 @@ static CodeError RunInfoMode(TreeNode_t* db_tree)
     printf(WHT "\n");
 
     sleep(3);
-    return NO_ERROR;
+    return NO_ERR;
 }
 
 #undef PRINT_FEATURE_

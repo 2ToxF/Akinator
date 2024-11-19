@@ -30,7 +30,7 @@ TreeError TreeAddNode(TreeNode_t* node, const TreeElem_t value, NodesRelation re
     else
         prev_node->right = node;
 
-    return TREE_NO_ERROR;
+    return TREE_NO_ERR;
 }
 
 
@@ -89,7 +89,7 @@ TreeNode_t* TreeInit(const TreeElem_t value)
 
 TreeError TreeInsertNode(NodeInsertionData* ins_node_data)
 {
-    TreeError tree_err = TREE_NO_ERROR;
+    TreeError tree_err = TREE_NO_ERR;
 
     if (ins_node_data->prev_node == NULL)
         return TREE_INSERTION_BEFORE_ROOT_ERR;
@@ -102,7 +102,7 @@ TreeError TreeInsertNode(NodeInsertionData* ins_node_data)
         return TREE_INSERT_BOTH_RELATIONS_ERR;
 
     if ((tree_err = TreeAddNode(ins_node_data->prev_node, ins_node_data->ins_value,
-                                ins_node_data->relation_with_prev)) != TREE_NO_ERROR)
+                                ins_node_data->relation_with_prev)) != TREE_NO_ERR)
         return tree_err;
 
     if (ins_node_data->relation_with_prev == LEFT_SON)
