@@ -5,9 +5,9 @@
 #include "tree.h"
 #include "tree_dump.h"
 
-static const int MAX_file_name_LEN = 30;
+static const int MAX_FILE_NAME_LEN = 30;
 
-static char dump_graph_file_name[MAX_file_name_LEN] = {};
+static char dump_graph_file_name[MAX_FILE_NAME_LEN] = {};
 
 static int   dump_number    = 0;
 static FILE* dump_html_file_ptr = NULL;
