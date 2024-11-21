@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include "akinator.h"
 #include "database.h"
@@ -12,6 +11,9 @@
 #include "tree.h"
 #include "tree_dump.h"
 #include "utils.h"
+
+static char  speak_buffer[MAX_SPEAK_BUFFER_LEN] = {};
+static char* cur_speak = speak_buffer;
 
 static const int MAX_RELATIONS_ARR_SIZE = 100;
 
@@ -33,6 +35,8 @@ static CodeError   RunInfoMode      (TreeNode_t* db_tree);
 
 static ProgramMode ChooseProgramMode()
 {
+    cur_speak = speak_buffer;
+
     printf("\n\n"
            BLU "-----------------------------------------------------------------------------------------" WHT "\n\n"
            MAG
@@ -45,10 +49,12 @@ static ProgramMode ChooseProgramMode()
            "/**     /** /** //** /** /**    //*** /**     /**    /**     //*******   /**   //** \n"
            "//      //  //   //  //  //      ///  //      //     //       ///////    //     //  \n"
            "\n"
-           BLU "-----------------------------------------------------------------------------------------" WHT "\n\n\n");
+           BLU "-----------------------------------------------------------------------------------------" WHT "\n"
+           "\n\n");
 
-    printf(GRN "Choose one of modes:\n"
-               "[A] Akinanor      (wish someone or something and i'll guess it)\n"
+    PRINT_SPEAK_COLOR_MES(GRN, "Choose one of modes:\n");
+
+    printf(GRN "[A] Akinanor      (wish someone or something and i'll guess it)\n"
                "[C] Compare       (enter two characters and i'll show you their difference)\n"
                "[D] Database      (i'll show you current database tree)\n"
                "[I] Info          (enter character and i'll show you what i know about him)\n"
@@ -81,7 +87,9 @@ static ProgramMode ChooseProgramMode()
             return QUIT_NO_SAVE_MODE;
 
         else
-            printf(RED "Sorry, i don't know such mode :(" WHT "\n");
+        {
+            PRINT_SPEAK_COLOR_MES(RED, "Sorry, i don't know such mode :(\n");
+        }
     }
 
     return AKINATOR_MODE;
@@ -147,10 +155,18 @@ CodeError RunAkinator()
                 code_err = SaveTreeData(DATABASE_FILE_NAME, db_tree_root);
 
                 if (code_err == NO_ERR)
-                    printf(BLU "Database saved successfully" WHT "\n");
+                {
+                    PRINT_SPEAK_COLOR_MES(BLU, "Database saved successfully\n");
+                    printf(WHT "\n[Press enter to continue]\n");
+                    getchar();
+                }
 
                 else
-                    printf(RED "Database wasn't saved because of error" WHT "\n");
+                {
+                    PRINT_SPEAK_COLOR_MES(RED, "Database wasn't saved because of error\n");
+                    printf(WHT "\n[Press enter to continue]\n");
+                    getchar();
+                }
 
                 return code_err;
             }
@@ -169,22 +185,19 @@ CodeError RunAkinator()
 }
 
 
-char speak_buffer[4096] = {};
-char* cur_speak = speak_buffer;
-
 #define PRINT_FEATURE_(__first_idx__, __relations_arr_name__)                   \
     if (i != __first_idx__)                                                     \
-        cur_speak += sprintf(cur_speak, ", ");                                                           \
+        cur_speak += sprintf(cur_speak, ", ");                                  \
                                                                                 \
     if (__relations_arr_name__[i] == LEFT_SON)                                  \
     {                                                                           \
-        cur_speak += sprintf(cur_speak, "NOT %s", cur_node->data);                                       \
+        cur_speak += sprintf(cur_speak, "NOT %s", cur_node->data);              \
         cur_node = cur_node->left;                                              \
     }                                                                           \
                                                                                 \
     else if (__relations_arr_name__[i] == RIGHT_SON)                            \
     {                                                                           \
-        cur_speak += sprintf(cur_speak, "%s", cur_node->data);                                           \
+        cur_speak += sprintf(cur_speak, "%s", cur_node->data);                  \
         cur_node = cur_node->right;                                             \
     }
 
@@ -196,21 +209,24 @@ char* cur_speak = speak_buffer;
     NodesRelation __relations_arr_name__[MAX_RELATIONS_ARR_SIZE] = {};                                                  \
     if (!TreeFindLeaf(__tree_name__, __relations_arr_name__, __character_var_name__, 0))                                \
     {                                                                                                                   \
-        printf(RED "Sorry, I didn't find such character (%s) in my database" WHT "\n", __character_var_name__);         \
-        sleep(1);                                                                                                       \
-        return NO_ERR;                                                                                                \
+        PRINT_SPEAK_COLOR_MES(RED, "Sorry, I didn't find such character (%s) in my database\n",                         \
+                              __character_var_name__);                                                                  \
+        printf(WHT "\n[Press enter to continue]\n");                                                                    \
+        getchar();                                                                                                      \
+        return NO_ERR;                                                                                                  \
     }
 
 static CodeError RunCompareMode(TreeNode_t* db_tree)
 {
     cur_speak = speak_buffer;
 
-    printf(YEL "Enter two characters who you want to compare" WHT "\n");
-
+    PRINT_SPEAK_COLOR_MES(YEL, "Enter two characters who you want to compare\n");
     SCAN_CHARACTER_AND_FIND_LEAF_(db_tree, relations_arr1, character1);
     SCAN_CHARACTER_AND_FIND_LEAF_(db_tree, relations_arr2, character2);
 
-    cur_speak += sprintf(cur_speak, YEL "Characters %s and %s have the following features in both: ", character1, character2);
+    printf(YEL);
+
+    cur_speak += sprintf(cur_speak, "Similar features: ");
     int i = 0;
     TreeNode_t* cur_node = db_tree;
     while (relations_arr1[i] == relations_arr2[i] && relations_arr1[i] != NO_RELATION)
@@ -218,49 +234,57 @@ static CodeError RunCompareMode(TreeNode_t* db_tree)
         PRINT_FEATURE_(0, relations_arr1);
         ++i;
     }
-    printf(WHT "\n");
+    cur_speak += sprintf(cur_speak, "\n");
 
     TreeNode_t* distinctive_node = cur_node;
     int distinctive_i = i;
-    cur_speak += sprintf(cur_speak, YEL "Character %s has the following distinctive features: ", character1);
+    cur_speak += sprintf(cur_speak, "Unique features of %s: ", character1);
     while (relations_arr1[i] != NO_RELATION)
     {
         PRINT_FEATURE_(distinctive_i, relations_arr1);
         ++i;
     }
-    printf(WHT "\n");
+    cur_speak += sprintf(cur_speak, "\n");
 
     i = distinctive_i;
     cur_node = distinctive_node;
-    cur_speak += sprintf(cur_speak, YEL "Character %s has the following distinctive features: ", character2);
+    cur_speak += sprintf(cur_speak, "Unique features of %s: ", character2);
     while (relations_arr2[i] != NO_RELATION)
     {
         PRINT_FEATURE_(distinctive_i, relations_arr2);
         ++i;
     }
-    printf(WHT "\n");
+    cur_speak += sprintf(cur_speak, "\n");
 
     txSpeak("\v\a%s", speak_buffer);
+    printf(WHT "\n[Press enter to continue]\n");
+    getchar();
 
-    sleep(3);
     return NO_ERR;
 }
 
 
 static CodeError RunInfoMode(TreeNode_t* db_tree)
 {
-    printf(YEL "Enter the character whose description you want to get" WHT "\n");
+    cur_speak = speak_buffer;
+
+    PRINT_SPEAK_COLOR_MES(YEL, "Enter the character whose description you want to get\n");
     SCAN_CHARACTER_AND_FIND_LEAF_(db_tree, relations_arr, character)
 
-    printf(YEL "I found character %s in my database with the following features: ", character);
+    printf(YEL);
+
+    cur_speak += sprintf(cur_speak, "Features of %s: ", character);
     TreeNode_t* cur_node = db_tree;
     for (int i = 0; relations_arr[i] != NO_RELATION; ++i)
     {
         PRINT_FEATURE_(0, relations_arr);
     }
-    printf(WHT "\n");
+    cur_speak += sprintf(cur_speak, "\n");
 
-    sleep(3);
+    txSpeak("\v\a%s", speak_buffer);
+    printf(WHT "\n[Press enter to continue]\n");
+    getchar();
+
     return NO_ERR;
 }
 

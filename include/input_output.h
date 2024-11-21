@@ -12,6 +12,15 @@
 #define CYN "\033[0;36m"
 #define WHT "\033[0;37m"
 
+#define PRINT_SPEAK_COLOR_MES(__color__, __message__, ...)                                  \
+    printf(__color__);                                                                      \
+    cur_speak = speak_buffer;                                                               \
+    cur_speak += sprintf(cur_speak, __message__, ## __VA_ARGS__);                           \
+    txSpeak("\v\a%s", speak_buffer);                                                        \
+    cur_speak = speak_buffer;                                                               \
+    printf(WHT)
+
+
 CodeError MyFread(char** input_buffer, long int* input_buffer_length, const char* input_file_name);
 void PrintCodeError(CodeError code_err);
 

@@ -12,17 +12,9 @@ INC_DIR := include
 OBJ_DIR := object
 LOG_DIR := logs
 
-STK_DIR := Stack
-
 SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
-STK_SRC := $(wildcard $(STK_DIR)/$(SRC_DIR)/*.cpp)
-
 INCLUDES := $(wildcard $(INC_DIR)/*.h)
-STK_INC  := $(wildcard $(STK_DIR)/$(INC_DIR)/*.h)
-
 OBJECTS := $(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
-STK_OBJ := $(STK_SRC:$(STK_DIR)/$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
-
 EXE := Akinator.exe
 
 DOCS_NAME := Docs_config
@@ -32,14 +24,11 @@ all: $(OBJ_DIR) $(EXE)
 $(OBJ_DIR):
 	@mkdir $@
 
-$(EXE): $(OBJECTS) $(STK_OBJ)
+$(EXE): $(OBJECTS)
 	@$(CC) $(OBJECTS) -o $@
 
-$(OBJECTS): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INCLUDES) $(STK_INC)
-	@$(CC) -c $(DED_FLAGS) $(ADD_FLAGS) -I$(INC_DIR) -I$(STK_DIR)/$(INC_DIR) $< -o $@
-
-$(STK_OBJ): $(OBJ_DIR)/%.o: $(STK_DIR)/$(SRC_DIR)/%.cpp $(STK_INC)
-	@$(CC) -c $(DED_FLAGS) $(ADD_FLAGS) -I$(STK_DIR)/$(INC_DIR) $< -o $@
+$(OBJECTS): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INCLUDES)
+	@$(CC) -c $(DED_FLAGS) $(ADD_FLAGS) -I$(INC_DIR) $< -o $@
 
 $(LOG_DIR):
 	@mkdir $@

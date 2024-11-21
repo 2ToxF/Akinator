@@ -1,8 +1,10 @@
 #ifndef _SETTINGS_H
 #define _SETTINGS_H
 
-static const char* const DATABASE_FILE_NAME = "Test_DB.txt";
-const int MAX_STR_LEN = 100;
+const char* const DATABASE_FILE_NAME = "Test_DB.txt";
+
+const int MAX_SPEAK_BUFFER_LEN = 4096;
+const int MAX_STR_LEN          = 100;
 
 typedef char TreeElem_t[MAX_STR_LEN];
 
