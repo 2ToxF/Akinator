@@ -33,7 +33,7 @@ void ClearBuffer()
 }
 
 
-CodeError Fsize(const char* file_name, long int* input_buffer_length)
+CodeError GetFileSize(const char* file_name, long int* input_buffer_length)
 {
     struct stat input_file_stat = {};
     if (stat(file_name, &input_file_stat) != 0)

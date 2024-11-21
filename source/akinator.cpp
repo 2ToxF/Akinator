@@ -99,7 +99,7 @@ static CodeError OpenDBBrowser(TreeNode_t* db_tree)
     DumpClose();
 
     char abs_file_path_buffer[MAX_ABS_PATH_LEN] = {};
-    GetFullPathName(DUMP_HTML_FNAME, MAX_ABS_PATH_LEN, abs_file_path_buffer, NULL);
+    GetFullPathName(DUMP_HTML_FILE_NAME, MAX_ABS_PATH_LEN, abs_file_path_buffer, NULL);
 
     char command_open_html[MAX_CMD_LEN] = {};
     sprintf(command_open_html, "start %s", abs_file_path_buffer);

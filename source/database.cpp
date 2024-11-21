@@ -11,7 +11,7 @@ static void SaveNode(FILE* database, TreeNode_t* node, int node_level);
 static CodeError ScanNode(char** database_buf, TreeNode_t** node);
 
 
-CodeError ReadDatabase(const char* database_fname, TreeNode_t** root)
+CodeError ReadDatabase(const char* database_file_name, TreeNode_t** root)
 {
     CodeError code_err = NO_ERR;
 
@@ -20,7 +20,7 @@ CodeError ReadDatabase(const char* database_fname, TreeNode_t** root)
 
     char*    database_buf = NULL;
     long int database_buf_length = 0;
-    if ((code_err = MyFread(&database_buf, &database_buf_length, database_fname)) != NO_ERR)
+    if ((code_err = MyFread(&database_buf, &database_buf_length, database_file_name)) != NO_ERR)
         return code_err;
 
     start_database_buf = database_buf;
@@ -118,12 +118,12 @@ static CodeError ScanNode(char** database_buf, TreeNode_t** node)
 #undef READ_SENTENCE_
 
 
-CodeError SaveTreeData(const char* database_fname, TreeNode_t* root)
+CodeError SaveTreeData(const char* database_file_name, TreeNode_t* root)
 {
     if (root == NULL)
         return NULL_TREE_TO_SAVE_ERR;
 
-    FILE* database = fopen(database_fname, "w");
+    FILE* database = fopen(database_file_name, "w");
     if (database == NULL)
         return FILE_NOT_OPENED_ERR;
 

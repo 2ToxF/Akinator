@@ -3,7 +3,7 @@
 
 #include "tree.h"
 
-CodeError ReadDatabase(const char* database_fname, TreeNode_t** root);
-CodeError SaveTreeData(const char* database_fname, TreeNode_t*  root);
+CodeError ReadDatabase(const char* database_file_name, TreeNode_t** root);
+CodeError SaveTreeData(const char* database_file_name, TreeNode_t*  root);
 
 #endif

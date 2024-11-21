@@ -5,12 +5,12 @@
 #include "tree.h"
 #include "tree_dump.h"
 
-static const int MAX_FNAME_LEN = 30;
+static const int MAX_file_name_LEN = 30;
 
-static char dump_graph_fname[MAX_FNAME_LEN] = {};
+static char dump_graph_file_name[MAX_file_name_LEN] = {};
 
 static int   dump_number    = 0;
-static FILE* dump_html_fptr = NULL;
+static FILE* dump_html_file_ptr = NULL;
 
 static void DumpDotFile  (TreeNode_t* node);
 static void DumpDotNode  (FILE* dot_file, TreeNode_t* node, TreeNode_t* prev_node, NodesRelation tree_relation);
@@ -19,16 +19,16 @@ static void SystemCallDot();
 
 void DumpClose()
 {
-    if (dump_html_fptr != NULL)
+    if (dump_html_file_ptr != NULL)
     {
-        fclose(dump_html_fptr);
-        dump_html_fptr = NULL;
+        fclose(dump_html_file_ptr);
+        dump_html_file_ptr = NULL;
     }
 }
 
 static void DumpDotFile(TreeNode_t* node)
 {
-    FILE* dot_file = fopen(DUMP_DOT_FNAME, "w");
+    FILE* dot_file = fopen(DUMP_DOT_FILE_NAME, "w");
 
     fprintf(dot_file,
             "digraph {\n"
@@ -91,20 +91,20 @@ static void DumpDotNode(FILE* dot_file, TreeNode_t* node, TreeNode_t* prev_node,
 
 static void DumpHtmlFile()
 {
-    if (dump_html_fptr == NULL)
+    if (dump_html_file_ptr == NULL)
     {
-        dump_html_fptr = fopen(DUMP_HTML_FNAME, "w");
-        if (dump_html_fptr == NULL)
-            printf(RED "ERROR during dump: FILE WAS NOT OPENED (name of file: %s)" WHT "\n", DUMP_HTML_FNAME);
+        dump_html_file_ptr = fopen(DUMP_HTML_FILE_NAME, "w");
+        if (dump_html_file_ptr == NULL)
+            printf(RED "ERROR during dump: FILE WAS NOT OPENED (name of file: %s)" WHT "\n", DUMP_HTML_FILE_NAME);
     }
 
-    fprintf(dump_html_fptr,
+    fprintf(dump_html_file_ptr,
             "<img src=\"%s\"> <br>\n"
             "-----------------------------------------------------------------------------------------------"
             "-----------------------------------------------------------------------------------------------"
             "------------------------------------------------------------------------------------ <br><br>\n"
             "\n",
-            dump_graph_fname);
+            dump_graph_file_name);
 }
 
 
@@ -119,10 +119,10 @@ void TreeDump(TreeNode_t* node)
 
 void SystemCallDot()
 {
-    sprintf(dump_graph_fname, "tree_graph%d.svg", dump_number);
+    sprintf(dump_graph_file_name, "tree_graph%d.svg", dump_number);
 
     char command[MAX_CMD_LEN] = {};
-    sprintf(command, "dot -Tsvg " DUMP_DOT_FNAME " -o " DUMP_LOG_PATH "%s", dump_graph_fname);
+    sprintf(command, "dot -Tsvg " DUMP_DOT_FILE_NAME " -o " DUMP_LOG_PATH "%s", dump_graph_file_name);
 
     if (system(command) != 0)
     {

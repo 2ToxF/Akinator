@@ -12,19 +12,19 @@ CodeError MyFread(char** input_buffer, long int* input_buffer_length, const char
 {
     CodeError code_err = NO_ERR;
 
-    FILE* input_fptr = fopen(input_file_name, "rb");
-    if (input_fptr == NULL)
+    FILE* input_file_ptr = fopen(input_file_name, "rb");
+    if (input_file_ptr == NULL)
         return FILE_NOT_OPENED_ERR;
 
-    if ((code_err = Fsize(input_file_name, input_buffer_length)) != NO_ERR)
+    if ((code_err = GetFileSize(input_file_name, input_buffer_length)) != NO_ERR)
         return code_err;
 
     *input_buffer = (char*) calloc(*input_buffer_length, sizeof(char));
-    long long unsigned int success_read_string_length = fread(*input_buffer, 1, *input_buffer_length - 1, input_fptr);
+    long long unsigned int success_read_string_length = fread(*input_buffer, 1, *input_buffer_length - 1, input_file_ptr);
     if (success_read_string_length != (long long unsigned int) (*input_buffer_length - 1))
         return WRONG_BUFSIZE_ERR;
 
-    fclose(input_fptr); input_fptr = NULL;
+    fclose(input_file_ptr); input_file_ptr = NULL;
     return code_err;
 }
 
