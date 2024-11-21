@@ -5,7 +5,7 @@
 
 #define DUMP_LOG_PATH  "logs/"
 #define DUMP_DOT_FNAME DUMP_LOG_PATH "dump_dotfile"
-#define DUMP_HTML_FNAME DUMP_LOG_PATH "tree_log.html"
+const char* const DUMP_HTML_FNAME = DUMP_LOG_PATH "tree_log.html";
 
 void DumpClose();
 void TreeDump (TreeNode_t* node);

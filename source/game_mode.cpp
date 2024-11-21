@@ -1,6 +1,3 @@
-#define TX_USE_SPEAK
-#include <TXLib.h>
-
 #include <stdio.h>
 #include <string.h>
 
@@ -10,9 +7,6 @@
 #include "input_output.h"
 #include "tree.h"
 #include "utils.h"
-
-static char  speak_buffer[MAX_SPEAK_BUFFER_LEN] = {};
-static char* cur_speak = speak_buffer;
 
 struct NodeContext
 {
@@ -29,7 +23,7 @@ struct NewElemForDatabase
 
 static bool      AskOneMoreGame();
 static void      AskQuestion   (NodeContext* node_context);
-static void      GetNewData    (NewElemForDatabase* new_data);
+static void      GetNewData    (NewElemForDatabase* new_data, const char* akinator_answer);
 static bool      GiveAnswer    (NodeContext* node_context, CodeError* p_code_err);
 static bool      RunOneGame    (TreeNode_t* db_tree, CodeError* p_code_err);
 static CodeError UpdateDatabase(NodeContext* node_context, NewElemForDatabase* new_data);
@@ -37,15 +31,14 @@ static CodeError UpdateDatabase(NodeContext* node_context, NewElemForDatabase* n
 
 static bool AskOneMoreGame()
 {
-
-
     int user_answer = 0;
     while (true)
     {
         if (user_answer != '\n' && user_answer != 0)
             ClearBuffer();
 
-        PRINT_SPEAK_COLOR_MES(YEL, "Do you wanna play one more time? (Y|N)\n");
+        PRINT_SPEAK_COLOR_MES(YEL, "Do you wanna play one more time?");
+        printf(YEL " (Y|N)" WHT "\n");
         user_answer = getchar();
 
         if (CHECK_USER_ANSWER(user_answer, 'y', 'Y'))
@@ -67,9 +60,8 @@ static bool AskOneMoreGame()
 
 static void AskQuestion(NodeContext* node_context)
 {
-
-
-    PRINT_SPEAK_COLOR_MES(YEL, "Your character %s? (Y|N)\n", node_context->node->data);
+    PRINT_SPEAK_COLOR_MES(YEL, "Your character %s?", node_context->node->data);
+    printf(YEL " (Y|N)" WHT "\n");
 
     int user_answer = getchar();
 
@@ -96,10 +88,8 @@ static void AskQuestion(NodeContext* node_context)
 }
 
 
-static void GetNewData(NewElemForDatabase* new_data)
+static void GetNewData(NewElemForDatabase* new_data, const char* akinator_answer)
 {
-
-
     PRINT_SPEAK_COLOR_MES(MAG, "\n!!! WARNING: don't use double quotes while writing answers - "
                                "it definitely WILL cause errors !!!\n\n");
 
@@ -120,8 +110,10 @@ static void GetNewData(NewElemForDatabase* new_data)
 
     while (true)
     {
-        PRINT_SPEAK_COLOR_MES(CYN, "What is the differecnce between your character and my answer.\n"
-                             "Your character (continue the phrase) ");
+        PRINT_SPEAK_COLOR_MES(CYN,
+                              "What is the differecnce between %s and %s?\n"
+                              "%s (continue the phrase) ",
+                              new_data->character, akinator_answer, new_data->character);
         scanf("%[^\n]", new_data->question);
 
         if (new_data->question[0] != '\0')
@@ -151,8 +143,6 @@ CodeError RunGameMode(TreeNode_t* db_tree)
 
 static bool GiveAnswer(NodeContext* node_context, CodeError* p_code_err)
 {
-
-
     int user_answer = 0;
 
     while (true)
@@ -160,8 +150,9 @@ static bool GiveAnswer(NodeContext* node_context, CodeError* p_code_err)
         if (user_answer != '\n' && user_answer != 0)
             ClearBuffer();
 
-        PRINT_SPEAK_COLOR_MES(CYN, "I think your character is \"%s\". Is that correct? (Y|N)\n",
+        PRINT_SPEAK_COLOR_MES(CYN, "I think your character is \"%s\". Is that correct?",
                               node_context->node->data);
+        printf(CYN " (Y|N)" WHT "\n");
         user_answer = getchar();
 
         if (CHECK_USER_ANSWER(user_answer, 'y', 'Y'))
@@ -172,7 +163,7 @@ static bool GiveAnswer(NodeContext* node_context, CodeError* p_code_err)
         else if (CHECK_USER_ANSWER(user_answer, 'n', 'N'))
         {
             NewElemForDatabase new_data = {};
-            GetNewData(&new_data);
+            GetNewData(&new_data, node_context->node->data);
             if ((*p_code_err = UpdateDatabase(node_context, &new_data)) != NO_ERR)
                 return false;
         }
@@ -190,8 +181,6 @@ static bool GiveAnswer(NodeContext* node_context, CodeError* p_code_err)
 
 static bool RunOneGame(TreeNode_t* db_tree, CodeError* p_code_err)
 {
-
-
     NodeContext node_context = {db_tree, db_tree, NO_RELATION};
 
     while (true)

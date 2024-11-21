@@ -1,3 +1,6 @@
+#define TX_USE_SPEAK
+#include <TXLib.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -64,4 +67,10 @@ void PrintCodeError(CodeError code_error)
     }
 
     #undef ERR_DESCR_
+}
+
+
+void PrintVoiceMessage(const char* message_buffer)
+{
+    txSpeak("\v\a%s", message_buffer);
 }

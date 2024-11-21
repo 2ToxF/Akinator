@@ -5,7 +5,6 @@
 #include "tree.h"
 #include "tree_dump.h"
 
-static const int MAX_CMD_LEN   = 100;
 static const int MAX_FNAME_LEN = 30;
 
 static char dump_graph_fname[MAX_FNAME_LEN] = {};

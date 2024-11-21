@@ -42,17 +42,9 @@
 		{
 			is DED KVADROBER??
 			{
-				gay
-				{
-					Some pidoras
-					*
-					*
-				}
-				{
-					Toxa
-					*
-					*
-				}
+				Toxa
+				*
+				*
 			}
 			{
 				DED KVADROBER
@@ -63,7 +55,7 @@
 		{
 			lives in the 'Kopeika' dormitory
 			{
-				Piska
+				Child
 				*
 				*
 			}

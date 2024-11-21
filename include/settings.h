@@ -5,6 +5,7 @@ const char* const DATABASE_FILE_NAME = "Test_DB.txt";
 
 const int MAX_SPEAK_BUFFER_LEN = 4096;
 const int MAX_STR_LEN          = 100;
+const int MAX_CMD_LEN          = 310;
 
 typedef char TreeElem_t[MAX_STR_LEN];
 

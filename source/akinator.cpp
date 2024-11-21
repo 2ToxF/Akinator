@@ -1,8 +1,6 @@
-#define TX_USE_SPEAK
-#include <TXLib.h>
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <windows.h>
 
 #include "akinator.h"
 #include "database.h"
@@ -15,6 +13,7 @@
 static char  speak_buffer[MAX_SPEAK_BUFFER_LEN] = {};
 static char* cur_speak = speak_buffer;
 
+static const int MAX_ABS_PATH_LEN       = 300;
 static const int MAX_RELATIONS_ARR_SIZE = 100;
 
 enum ProgramMode
@@ -35,8 +34,6 @@ static CodeError   RunInfoMode      (TreeNode_t* db_tree);
 
 static ProgramMode ChooseProgramMode()
 {
-    cur_speak = speak_buffer;
-
     printf("\n\n"
            BLU "-----------------------------------------------------------------------------------------" WHT "\n\n"
            MAG
@@ -100,16 +97,23 @@ static CodeError OpenDBBrowser(TreeNode_t* db_tree)
 {
     TreeDump(db_tree);
     DumpClose();
-    if (system("start file:///C:/Users/Anton/Documents/GitHub/Akinator/" DUMP_HTML_FNAME) != 0)
+
+    char abs_file_path_buffer[MAX_ABS_PATH_LEN] = {};
+    GetFullPathName(DUMP_HTML_FNAME, MAX_ABS_PATH_LEN, abs_file_path_buffer, NULL);
+
+    char command_open_html[MAX_CMD_LEN] = {};
+    sprintf(command_open_html, "start %s", abs_file_path_buffer);
+    printf("%s", command_open_html);
+
+    if (system(command_open_html) != 0)
         return SYSTEM_CALL_ERR;
+
     return NO_ERR;
 }
 
 
 CodeError RunAkinator()
 {
-    txDisableAutoPause();
-
     CodeError code_err = NO_ERR;
 
     TreeNode_t* db_tree_root = NULL;
@@ -256,7 +260,7 @@ static CodeError RunCompareMode(TreeNode_t* db_tree)
     }
     cur_speak += sprintf(cur_speak, "\n");
 
-    txSpeak("\v\a%s", speak_buffer);
+    PrintVoiceMessage(speak_buffer);
     printf(WHT "\n[Press enter to continue]\n");
     getchar();
 
@@ -281,7 +285,7 @@ static CodeError RunInfoMode(TreeNode_t* db_tree)
     }
     cur_speak += sprintf(cur_speak, "\n");
 
-    txSpeak("\v\a%s", speak_buffer);
+    PrintVoiceMessage(speak_buffer);
     printf(WHT "\n[Press enter to continue]\n");
     getchar();
 
